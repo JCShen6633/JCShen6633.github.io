@@ -78,45 +78,22 @@
       .toast-notification.show {
         opacity: 1;
       }
-      .user-dropdown {
-        position: relative;
-        display: inline-block;
+      .user-menu {
+        transform-origin: top right;
+        transform: scale(0);
+        transition: transform 0.2s ease;
       }
-      .dropdown-content {
-        display: none;
-        position: absolute;
-        right: 0;
-        background-color: white;
-        min-width: 160px;
-        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.1);
-        z-index: 100;
-        border-radius: 8px;
-        overflow: hidden;
-        margin-top: 5px;
-      }
-      .dropdown-content a {
-        color: #333;
-        padding: 12px 16px;
-        text-decoration: none;
-        display: block;
-        text-align: left;
-        font-size: 14px;
-      }
-      .dropdown-content a:hover {
-        background-color: #f5f5f5;
-      }
-      .dropdown-content .divider {
-        border-top: 1px solid #eee;
-        margin: 5px 0;
+      .user-menu.show {
+        transform: scale(1);
       }
     }
   </style>
 </head>
 
 <body class="bg-wiki-bg text-wiki-text">
-  <!-- 预览提示弹窗 -->
+  <!-- 提示弹窗 -->
   <div id="toast" class="toast-notification">
-    即将跳转到：首页
+    操作提示
   </div>
 
   <!-- 顶部导航栏 -->
@@ -125,7 +102,7 @@
       <!-- 第一行：Logo和搜索框 -->
       <div class="flex flex-col md:flex-row items-center justify-between py-4">
         <!-- Logo区域 -->
-        <a href="index.html" class="flex items-center" data-page="首页">
+        <a href="index.html" class="flex items-center mb-4 md:mb-0" data-page="首页">
           <img src="https://picsum.photos/40/40?random=100" alt="绝区零Wiki" class="w-10 h-10 mr-3">
           <div>
             <div class="font-bold text-lg text-primary">绝区零Wiki</div>
@@ -141,32 +118,45 @@
             <input type="text" placeholder="搜索角色、武器或攻略..." class="bg-transparent outline-none text-sm w-full">
           </div>
           
-          <!-- 未登录状态：显示登录按钮 -->
-          <div id="login-button-container">
-            <a href="login.html" class="text-sm bg-primary text-white px-5 py-2 rounded-full hover:bg-primary/90 transition-colors" data-page="登录页面">登录</a>
-          </div>
-          
-          <!-- 已登录状态：显示用户信息 (默认隐藏) -->
-          <div id="user-info-container" class="hidden flex items-center gap-3">
-            <div class="user-dropdown">
-              <button id="user-dropdown-btn" class="flex items-center gap-2 focus:outline-none">
-                <img src="https://picsum.photos/40/40?random=200" alt="用户头像" class="w-8 h-8 rounded-full border-2 border-primary">
-                <span class="text-sm font-medium hidden md:inline-block">admin</span>
-                <i class="fa-solid fa-angle-down text-xs text-wiki-lighttext"></i>
-              </button>
-              <div class="dropdown-content">
-                <a href="#"><i class="fa-solid fa-user mr-2"></i>个人中心</a>
-                <a href="#"><i class="fa-solid fa-cog mr-2"></i>账号设置</a>
-                <div class="divider"></div>
-                <a href="#" id="logout-btn"><i class="fa-solid fa-sign-out mr-2"></i>退出登录</a>
+          <!-- 用户区域 - 未登录显示登录按钮，已登录显示头像和用户名 -->
+          <div id="user-area" class="relative">
+            <!-- 未登录状态 -->
+            <div id="not-logged-in" class="block">
+              <a href="login.html" class="text-sm bg-primary text-white px-5 py-2 rounded-full hover:bg-primary/90 transition-colors" data-page="登录页面">登录</a>
+            </div>
+            
+            <!-- 已登录状态 (默认隐藏) -->
+            <div id="logged-in" class="hidden flex items-center gap-2">
+              <span class="text-sm hidden md:inline-block" id="username-display"></span>
+              <div class="relative">
+                <button id="user-menu-btn" class="w-8 h-8 rounded-full overflow-hidden border-2 border-primary/20">
+                  <img id="user-avatar" src="" alt="用户头像" class="w-full h-full object-cover">
+                </button>
+                
+                <!-- 用户下拉菜单 -->
+                <div id="user-menu" class="user-menu absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-wiki-border py-2 z-50">
+                  <a href="user/profile.html" class="block px-4 py-2 text-sm hover:bg-wiki-bg transition-colors" data-page="个人资料页面">
+                    <i class="fa-solid fa-user mr-2 text-secondary"></i>个人中心
+                  </a>
+                  <a href="user/collections.html" class="block px-4 py-2 text-sm hover:bg-wiki-bg transition-colors" data-page="我的收藏页面">
+                    <i class="fa-solid fa-bookmark mr-2 text-secondary"></i>我的收藏
+                  </a>
+                  <a href="user/settings.html" class="block px-4 py-2 text-sm hover:bg-wiki-bg transition-colors" data-page="设置页面">
+                    <i class="fa-solid fa-cog mr-2 text-secondary"></i>设置
+                  </a>
+                  <div class="border-t border-wiki-border my-1"></div>
+                  <a href="#" id="logout-btn" class="block px-4 py-2 text-sm text-primary hover:bg-wiki-bg transition-colors">
+                    <i class="fa-solid fa-sign-out mr-2"></i>退出登录
+                  </a>
+                </div>
               </div>
             </div>
+            
+            <!-- 移动端菜单按钮 -->
+            <button id="mobile-menu-btn" class="md:hidden text-wiki-text p-2">
+              <i class="fa-solid fa-bars text-xl"></i>
+            </button>
           </div>
-          
-          <!-- 移动端菜单按钮 -->
-          <button id="mobile-menu-btn" class="md:hidden text-wiki-text p-2">
-            <i class="fa-solid fa-bars text-xl"></i>
-          </button>
         </div>
       </div>
       
@@ -204,11 +194,16 @@
           <a href="community.html" class="py-2 hover:text-primary transition-colors" data-page="社区页面">社区</a>
           <a href="download.html" class="py-2 hover:text-primary transition-colors" data-page="下载页面">下载游戏</a>
           <div id="mobile-user-menu" class="py-2 hidden">
-            <a href="#" class="block py-1 hover:text-primary transition-colors"><i class="fa-solid fa-user mr-2"></i>个人中心</a>
-            <a href="#" class="block py-1 hover:text-primary transition-colors"><i class="fa-solid fa-cog mr-2"></i>账号设置</a>
-            <a href="#" id="mobile-logout-btn" class="block py-1 hover:text-primary transition-colors"><i class="fa-solid fa-sign-out mr-2"></i>退出登录</a>
+            <a href="user/profile.html" class="block py-1 text-sm hover:text-primary transition-colors" data-page="个人资料页面">
+              <i class="fa-solid fa-user mr-2 text-secondary"></i>个人中心
+            </a>
+            <a href="user/settings.html" class="block py-1 text-sm hover:text-primary transition-colors" data-page="设置页面">
+              <i class="fa-solid fa-cog mr-2 text-secondary"></i>设置
+            </a>
+            <a href="#" id="mobile-logout-btn" class="block py-1 text-sm text-primary hover:text-primary/80 transition-colors">
+              <i class="fa-solid fa-sign-out mr-2"></i>退出登录
+            </a>
           </div>
-          <a href="login.html" id="mobile-login-link" class="py-2 text-primary" data-page="登录页面">登录/注册</a>
         </nav>
       </div>
     </div>
@@ -324,6 +319,63 @@
                 </div>
               </a>
             </div>
+            
+            <!-- 新增角色卡片5 -->
+            <div class="wiki-hover bg-white rounded-lg border border-wiki-border overflow-hidden">
+              <a href="characters/ailian.html" data-page="艾莲·乔详情页">
+                <div class="relative">
+                  <img src="https://picsum.photos/200/200?random=24" alt="艾莲·乔" class="w-full aspect-square object-cover">
+                  <div class="absolute top-1 right-1 bg-primary text-white text-xs px-1.5 py-0.5 rounded">S</div>
+                  <div class="absolute top-1 left-1 bg-accent text-white text-xs px-1.5 py-0.5 rounded">新</div>
+                </div>
+                <div class="p-2 text-center">
+                  <div class="font-medium text-sm truncate">艾莲·乔</div>
+                  <div class="text-xs text-wiki-lighttext">维多利亚家政 / 雷</div>
+                </div>
+              </a>
+            </div>
+            
+            <!-- 新增角色卡片6 -->
+            <div class="wiki-hover bg-white rounded-lg border border-wiki-border overflow-hidden">
+              <a href="characters/antonin.html" data-page="安东尼详情页">
+                <div class="relative">
+                  <img src="https://picsum.photos/200/200?random=25" alt="安东尼" class="w-full aspect-square object-cover">
+                  <div class="absolute top-1 right-1 bg-secondary text-white text-xs px-1.5 py-0.5 rounded">4</div>
+                </div>
+                <div class="p-2 text-center">
+                  <div class="font-medium text-sm truncate">安东尼</div>
+                  <div class="text-xs text-wiki-lighttext">白祇重工 / 火</div>
+                </div>
+              </a>
+            </div>
+            
+            <!-- 新增角色卡片7 -->
+            <div class="wiki-hover bg-white rounded-lg border border-wiki-border overflow-hidden">
+              <a href="characters/saya.html" data-page=" Saya详情页">
+                <div class="relative">
+                  <img src="https://picsum.photos/200/200?random=26" alt="Saya" class="w-full aspect-square object-cover">
+                  <div class="absolute top-1 right-1 bg-secondary text-white text-xs px-1.5 py-0.5 rounded">4</div>
+                </div>
+                <div class="p-2 text-center">
+                  <div class="font-medium text-sm truncate">Saya</div>
+                  <div class="text-xs text-wiki-lighttext">对空六课 / 冰</div>
+                </div>
+              </a>
+            </div>
+            
+            <!-- 新增角色卡片8 -->
+            <div class="wiki-hover bg-white rounded-lg border border-wiki-border overflow-hidden">
+              <a href="characters/leon.html" data-page="莱昂详情页">
+                <div class="relative">
+                  <img src="https://picsum.photos/200/200?random=27" alt="莱昂" class="w-full aspect-square object-cover">
+                  <div class="absolute top-1 right-1 bg-secondary text-white text-xs px-1.5 py-0.5 rounded">4</div>
+                </div>
+                <div class="p-2 text-center">
+                  <div class="font-medium text-sm truncate">莱昂</div>
+                  <div class="text-xs text-wiki-lighttext">维多利亚家政 / 物理</div>
+                </div>
+              </a>
+            </div>
           </div>
           
           <!-- 角色筛选器 -->
@@ -366,6 +418,120 @@
                 </div>
               </div>
             </div>
+            
+            <!-- 攻略条目2 -->
+            <div class="flex flex-col md:flex-row gap-4 p-3 rounded-lg hover:bg-wiki-bg transition-colors">
+              <a href="guides/deep-nest.html" data-page="深巢探索攻略页面">
+                <img src="https://picsum.photos/200/120?random=31" alt="深巢探索攻略缩略图" class="md:w-48 h-28 object-cover rounded-lg flex-shrink-0">
+              </a>
+              <div class="flex-1">
+                <a href="guides/deep-nest.html" class="font-medium mb-1 hover:text-primary transition-colors" data-page="深巢探索攻略页面">
+                  <h3>「深巢探索」副本高效通关攻略与奖励获取</h3>
+                </a>
+                <p class="text-sm text-wiki-lighttext line-clamp-2 mb-2">针对1.2版本新增副本的详细攻略，包括最佳队伍配置、BOSS"噬骸者"机制解析和快速通关技巧，推荐携带护盾角色...</p>
+                <div class="flex items-center text-xs text-wiki-lighttext">
+                  <span>2025-07-18</span>
+                  <span class="mx-2">•</span>
+                  <span>副本攻略</span>
+                  <span class="mx-2">•</span>
+                  <span>8.3k 阅读</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- 攻略条目3 -->
+            <div class="flex flex-col md:flex-row gap-4 p-3 rounded-lg hover:bg-wiki-bg transition-colors">
+              <a href="guides/character-tier.html" data-page="角色强度排行页面">
+                <img src="https://picsum.photos/200/120?random=32" alt="角色强度排行缩略图" class="md:w-48 h-28 object-cover rounded-lg flex-shrink-0">
+              </a>
+              <div class="flex-1">
+                <a href="guides/character-tier.html" class="font-medium mb-1 hover:text-primary transition-colors" data-page="角色强度排行页面">
+                  <h3>1.2版本全角色强度排行榜与抽取建议</h3>
+                </a>
+                <p class="text-sm text-wiki-lighttext line-clamp-2 mb-2">基于1.2版本环境的角色强度评估，安比仍稳居S级榜首，新角色艾莲进入A级梯队，平民玩家推荐优先培养比利...</p>
+                <div class="flex items-center text-xs text-wiki-lighttext">
+                  <span>2025-07-15</span>
+                  <span class="mx-2">•</span>
+                  <span>强度节奏</span>
+                  <span class="mx-2">•</span>
+                  <span>15.7k 阅读</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- 新增攻略条目4 -->
+            <div class="flex flex-col md:flex-row gap-4 p-3 rounded-lg hover:bg-wiki-bg transition-colors">
+              <a href="guides/resource-farm.html" data-page="资源高效获取页面">
+                <img src="https://picsum.photos/200/120?random=33" alt="资源获取攻略缩略图" class="md:w-48 h-28 object-cover rounded-lg flex-shrink-0">
+              </a>
+              <div class="flex-1">
+                <a href="guides/resource-farm.html" class="font-medium mb-1 hover:text-primary transition-colors" data-page="资源高效获取页面">
+                  <h3>新手必看：角色养成资源高效获取指南</h3>
+                </a>
+                <p class="text-sm text-wiki-lighttext line-clamp-2 mb-2">详细介绍各类素材的最佳获取途径和效率对比，包括日常副本优先级、体力分配方案和快速提升代理人等级的技巧...</p>
+                <div class="flex items-center text-xs text-wiki-lighttext">
+                  <span>2025-07-12</span>
+                  <span class="mx-2">•</span>
+                  <span>新手攻略</span>
+                  <span class="mx-2">•</span>
+                  <span>10.2k 阅读</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        <!-- 新增：版本活动 -->
+        <section id="events" class="bg-white rounded-xl p-4 md:p-5 mb-6 wiki-shadow">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-bold">版本活动</h2>
+            <a href="events.html" class="text-primary text-sm hover:underline" data-page="活动列表页面">全部活动</a>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- 活动1 -->
+            <div class="relative rounded-lg overflow-hidden wiki-hover">
+              <img src="https://picsum.photos/400/200?random=60" alt="深巢回响活动" class="w-full h-40 object-cover">
+              <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-4">
+                <span class="bg-primary text-white text-xs px-2 py-0.5 rounded inline-block mb-2">进行中</span>
+                <h3 class="text-white font-medium">深巢回响</h3>
+                <p class="text-white/80 text-xs">2025-07-15 至 2025-08-15</p>
+              </div>
+              <a href="events/deep-nest.html" class="absolute inset-0" data-page="深巢回响活动详情"></a>
+            </div>
+            
+            <!-- 活动2 -->
+            <div class="relative rounded-lg overflow-hidden wiki-hover">
+              <img src="https://picsum.photos/400/200?random=61" alt="代理人特训" class="w-full h-40 object-cover">
+              <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-4">
+                <span class="bg-primary text-white text-xs px-2 py-0.5 rounded inline-block mb-2">进行中</span>
+                <h3 class="text-white font-medium">代理人特训</h3>
+                <p class="text-white/80 text-xs">2025-07-10 至 2025-08-30</p>
+              </div>
+              <a href="events/training.html" class="absolute inset-0" data-page="代理人特训活动详情"></a>
+            </div>
+            
+            <!-- 活动3 -->
+            <div class="relative rounded-lg overflow-hidden wiki-hover">
+              <img src="https://picsum.photos/400/200?random=62" alt="空洞净化作战" class="w-full h-40 object-cover">
+              <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-4">
+                <span class="bg-wiki-lighttext text-white text-xs px-2 py-0.5 rounded inline-block mb-2">即将开始</span>
+                <h3 class="text-white font-medium">空洞净化作战</h3>
+                <p class="text-white/80 text-xs">2025-08-01 至 2025-08-20</p>
+              </div>
+              <a href="events/purification.html" class="absolute inset-0" data-page="空洞净化作战活动详情"></a>
+            </div>
+            
+            <!-- 活动4 -->
+            <div class="relative rounded-lg overflow-hidden wiki-hover">
+              <img src="https://picsum.photos/400/200?random=63" alt="新艾利都庆典" class="w-full h-40 object-cover">
+              <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-4">
+                <span class="bg-wiki-lighttext text-white text-xs px-2 py-0.5 rounded inline-block mb-2">即将开始</span>
+                <h3 class="text-white font-medium">新艾利都庆典</h3>
+                <p class="text-white/80 text-xs">2025-08-10 至 2025-08-30</p>
+              </div>
+              <a href="events/celebration.html" class="absolute inset-0" data-page="新艾利都庆典活动详情"></a>
+            </div>
           </div>
         </section>
       </div>
@@ -383,6 +549,215 @@
               </div>
               <i class="fa-solid fa-angle-right text-wiki-lighttext"></i>
             </a>
+            <a href="lore/hollow-disaster.html" class="flex items-center justify-between text-sm p-2 hover:bg-wiki-bg rounded transition-colors" data-page="空洞灾害与净化机制页面">
+              <div class="flex items-center">
+                <i class="fa-solid fa-biohazard text-secondary mr-2 w-5 text-center"></i>
+                <span>空洞灾害与净化机制</span>
+              </div>
+              <i class="fa-solid fa-angle-right text-wiki-lighttext"></i>
+            </a>
+            <a href="guides/agent-level.html" class="flex items-center justify-between text-sm p-2 hover:bg-wiki-bg rounded transition-colors" data-page="代理人等级提升指南页面">
+              <div class="flex items-center">
+                <i class="fa-solid fa-user-gear text-secondary mr-2 w-5 text-center"></i>
+                <span>代理人等级提升指南</span>
+              </div>
+              <i class="fa-solid fa-angle-right text-wiki-lighttext"></i>
+            </a>
+            <a href="news/update-1.2.html" class="flex items-center justify-between text-sm p-2 hover:bg-wiki-bg rounded transition-colors" data-page="1.2版本更新日志页面">
+              <div class="flex items-center">
+                <i class="fa-solid fa-calendar-days text-secondary mr-2 w-5 text-center"></i>
+                <span>1.2版本更新日志</span>
+              </div>
+              <i class="fa-solid fa-angle-right text-wiki-lighttext"></i>
+            </a>
+            <a href="systems/combat.html" class="flex items-center justify-between text-sm p-2 hover:bg-wiki-bg rounded transition-colors" data-page="战斗系统详解页面">
+              <div class="flex items-center">
+                <i class="fa-solid fa-fist-raised text-secondary mr-2 w-5 text-center"></i>
+                <span>战斗系统详解</span>
+              </div>
+              <i class="fa-solid fa-angle-right text-wiki-lighttext"></i>
+            </a>
+            <a href="systems/teams.html" class="flex items-center justify-between text-sm p-2 hover:bg-wiki-bg rounded transition-colors" data-page="队伍搭配系统页面">
+              <div class="flex items-center">
+                <i class="fa-solid fa-users text-secondary mr-2 w-5 text-center"></i>
+                <span>队伍搭配系统</span>
+              </div>
+              <i class="fa-solid fa-angle-right text-wiki-lighttext"></i>
+            </a>
+          </div>
+        </div>
+        
+        <!-- 热门武器 -->
+        <div id="weapons" class="bg-white rounded-xl p-4 md:p-5 mb-6 wiki-shadow">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-base font-bold">热门武器</h3>
+            <a href="weapons.html" class="text-primary text-xs hover:underline" data-page="武器列表页面">全部武器</a>
+          </div>
+          <div class="space-y-3">
+            <!-- 武器1 -->
+            <div class="flex items-center gap-3 p-2 hover:bg-wiki-bg rounded transition-colors">
+              <a href="weapons/breakthrough.html" data-page="破空狙击步枪详情页">
+                <img src="https://picsum.photos/60/60?random=40" alt="破空狙击步枪" class="w-12 h-12 object-cover rounded">
+              </a>
+              <div class="flex-1 min-w-0">
+                <a href="weapons/breakthrough.html" class="text-sm font-medium truncate hover:text-primary transition-colors" data-page="破空狙击步枪详情页">破空狙击步枪</a>
+                <p class="text-xs text-wiki-lighttext">安比专属武器，提升暴击率</p>
+              </div>
+              <div class="bg-primary/10 text-primary text-xs px-1.5 py-0.5 rounded">S级</div>
+            </div>
+            
+            <!-- 武器2 -->
+            <div class="flex items-center gap-3 p-2 hover:bg-wiki-bg rounded transition-colors">
+              <a href="weapons/dual-pistols.html" data-page="双持战术手枪详情页">
+                <img src="https://picsum.photos/60/60?random=41" alt="双持战术手枪" class="w-12 h-12 object-cover rounded">
+              </a>
+              <div class="flex-1 min-w-0">
+                <a href="weapons/dual-pistols.html" class="text-sm font-medium truncate hover:text-primary transition-colors" data-page="双持战术手枪详情页">双持战术手枪</a>
+                <p class="text-xs text-wiki-lighttext">比利专属，增加连击伤害</p>
+              </div>
+              <div class="bg-secondary/10 text-secondary text-xs px-1.5 py-0.5 rounded">4星</div>
+            </div>
+            
+            <!-- 武器3 -->
+            <div class="flex items-center gap-3 p-2 hover:bg-wiki-bg rounded transition-colors">
+              <a href="weapons/giant-hammer.html" data-page="巨型粉碎锤详情页">
+                <img src="https://picsum.photos/60/60?random=42" alt="巨型粉碎锤" class="w-12 h-12 object-cover rounded">
+              </a>
+              <div class="flex-1 min-w-0">
+                <a href="weapons/giant-hammer.html" class="text-sm font-medium truncate hover:text-primary transition-colors" data-page="巨型粉碎锤详情页">巨型粉碎锤</a>
+                <p class="text-xs text-wiki-lighttext">苍角专属，提升防御力</p>
+              </div>
+              <div class="bg-secondary/10 text-secondary text-xs px-1.5 py-0.5 rounded">4星</div>
+            </div>
+            
+            <!-- 新增武器4 -->
+            <div class="flex items-center gap-3 p-2 hover:bg-wiki-bg rounded transition-colors">
+              <a href="weapons/thunder-sword.html" data-page="雷霆之刃详情页">
+                <img src="https://picsum.photos/60/60?random=43" alt="雷霆之刃" class="w-12 h-12 object-cover rounded">
+              </a>
+              <div class="flex-1 min-w-0">
+                <a href="weapons/thunder-sword.html" class="text-sm font-medium truncate hover:text-primary transition-colors" data-page="雷霆之刃详情页">雷霆之刃</a>
+                <p class="text-xs text-wiki-lighttext">艾莲专属，雷属性伤害</p>
+              </div>
+              <div class="bg-primary/10 text-primary text-xs px-1.5 py-0.5 rounded">S级</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 社区动态 -->
+        <div class="bg-white rounded-xl p-4 md:p-5 mb-6 wiki-shadow">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-base font-bold">社区动态</h3>
+            <a href="community.html" class="text-primary text-xs hover:underline" data-page="社区动态页面">更多动态</a>
+          </div>
+          <div class="space-y-4">
+            <div class="flex gap-3">
+              <img src="https://picsum.photos/40/40?random=50" alt="玩家头像" class="w-8 h-8 rounded-full flex-shrink-0">
+              <div class="flex-1">
+                <div class="flex items-center mb-1">
+                  <span class="text-sm font-medium">绝区零攻略组</span>
+                  <span class="text-xs text-wiki-lighttext ml-2">2小时前</span>
+                </div>
+                <p class="text-xs text-wiki-text">艾莲的隐藏连招技巧：普攻×3+技能+特殊攻击，伤害提升30%！实测有效，推荐大家尝试~</p>
+                <div class="flex mt-2 gap-2">
+                  <button class="text-xs text-wiki-lighttext hover:text-primary transition-colors">
+                    <i class="fa-solid fa-thumbs-up mr-1"></i> 128
+                  </button>
+                  <button class="text-xs text-wiki-lighttext hover:text-primary transition-colors">
+                    <i class="fa-solid fa-comment mr-1"></i> 32
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="flex gap-3">
+              <img src="https://picsum.photos/40/40?random=51" alt="攻略组头像" class="w-8 h-8 rounded-full flex-shrink-0">
+              <div class="flex-1">
+                <div class="flex items-center mb-1">
+                  <span class="text-sm font-medium">新艾利都情报站</span>
+                  <span class="text-xs text-wiki-lighttext ml-2">昨天</span>
+                </div>
+                <p class="text-xs text-wiki-text">1.2版本深巢探索最优路线图已更新，节省30%探索时间，欢迎查看！[图片]</p>
+                <div class="flex mt-2 gap-2">
+                  <button class="text-xs text-wiki-lighttext hover:text-primary transition-colors">
+                    <i class="fa-solid fa-thumbs-up mr-1"></i> 95
+                  </button>
+                  <button class="text-xs text-wiki-lighttext hover:text-primary transition-colors">
+                    <i class="fa-solid fa-comment mr-1"></i> 18
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="flex gap-3">
+              <img src="https://picsum.photos/40/40?random=52" alt="插画师头像" class="w-8 h-8 rounded-full flex-shrink-0">
+              <div class="flex-1">
+                <div class="flex items-center mb-1">
+                  <span class="text-sm font-medium">艾莲后援会</span>
+                  <span class="text-xs text-wiki-lighttext ml-2">3天前</span>
+                </div>
+                <p class="text-xs text-wiki-text">新绘制的艾莲同人图，希望大家喜欢~ [图片]</p>
+                <div class="flex mt-2 gap-2">
+                  <button class="text-xs text-wiki-lighttext hover:text-primary transition-colors">
+                    <i class="fa-solid fa-thumbs-up mr-1"></i> 217
+                  </button>
+                  <button class="text-xs text-wiki-lighttext hover:text-primary transition-colors">
+                    <i class="fa-solid fa-comment mr-1"></i> 43
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="flex gap-3">
+              <img src="https://picsum.photos/40/40?random=53" alt="玩家头像" class="w-8 h-8 rounded-full flex-shrink-0">
+              <div class="flex-1">
+                <div class="flex items-center mb-1">
+                  <span class="text-sm font-medium">空洞猎人</span>
+                  <span class="text-xs text-wiki-lighttext ml-2">4天前</span>
+                </div>
+                <p class="text-xs text-wiki-text">分享一个安比和艾莲的双C配队，清场速度一流，适合深巢探索高层！</p>
+                <div class="flex mt-2 gap-2">
+                  <button class="text-xs text-wiki-lighttext hover:text-primary transition-colors">
+                    <i class="fa-solid fa-thumbs-up mr-1"></i> 86
+                  </button>
+                  <button class="text-xs text-wiki-lighttext hover:text-primary transition-colors">
+                    <i class="fa-solid fa-comment mr-1"></i> 27
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 新增：最新资讯 -->
+        <div class="bg-white rounded-xl p-4 md:p-5 wiki-shadow">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-base font-bold">最新资讯</h3>
+            <a href="news.html" class="text-primary text-xs hover:underline" data-page="新闻列表页面">更多资讯</a>
+          </div>
+          <div class="space-y-4">
+            <a href="news/1.3-preview.html" class="block group" data-page="1.3版本预览页面">
+              <div class="relative rounded-lg overflow-hidden mb-2">
+                <img src="https://picsum.photos/300/160?random=70" alt="1.3版本预览" class="w-full h-36 object-cover group-hover:scale-105 transition-transform duration-300">
+                <div class="absolute top-2 left-2 bg-primary text-white text-xs px-2 py-0.5 rounded">前瞻</div>
+              </div>
+              <h4 class="font-medium text-sm group-hover:text-primary transition-colors">1.3版本「白夜回响」内容前瞻：新角色与玩法曝光</h4>
+              <p class="text-xs text-wiki-lighttext mt-1">2025-07-22</p>
+            </a>
+            
+            <div class="border-t border-wiki-border pt-3"></div>
+            
+            <a href="news/summer-campaign.html" class="block group" data-page="夏日活动公告页面">
+              <h4 class="font-medium text-sm group-hover:text-primary transition-colors">「夏日嘉年华」活动即将开启，登录即领10连抽</h4>
+              <p class="text-xs text-wiki-lighttext mt-1">2025-07-20</p>
+            </a>
+            
+            <div class="border-t border-wiki-border pt-3"></div>
+            
+            <a href="news/developer-interview.html" class="block group" data-page="开发者访谈页面">
+              <h4 class="font-medium text-sm group-hover:text-primary transition-colors">开发者访谈：未来角色设计方向与玩法规划</h4>
+              <p class="text-xs text-wiki-lighttext mt-1">2025-07-18</p>
+            </a>
           </div>
         </div>
       </div>
@@ -399,8 +774,54 @@
             <span class="font-bold">绝区零Wiki</span>
           </div>
           <p class="text-white/80 text-sm">
-            致力于为玩家提供最全面的绝区零游戏资料和攻略
+            致力于为玩家提供最全面的绝区零游戏资料和攻略，助力玩家探索新艾利都的每一个角落。
           </p>
+        </div>
+        
+        <div>
+          <h4 class="font-medium mb-4">快速链接</h4>
+          <ul class="space-y-2 text-sm text-white/80">
+            <li><a href="index.html" class="hover:text-white transition-colors" data-page="首页">首页</a></li>
+            <li><a href="characters.html" class="hover:text-white transition-colors" data-page="角色图鉴页面">角色图鉴</a></li>
+            <li><a href="guides.html" class="hover:text-white transition-colors" data-page="游戏攻略页面">游戏攻略</a></li>
+            <li><a href="lore.html" class="hover:text-white transition-colors" data-page="剧情设定页面">剧情设定</a></li>
+            <li><a href="events.html" class="hover:text-white transition-colors" data-page="活动列表页面">活动中心</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="font-medium mb-4">相关资源</h4>
+          <ul class="space-y-2 text-sm text-white/80">
+            <li><a href="https://honkai-star-rail.mihoyo.com/" target="_blank" class="hover:text-white transition-colors">官方网站</a></li>
+            <li><a href="https://www.bilibili.com/video/keyword/%E7%BB%E5%E5%8C%E9%9B%B6" target="_blank" class="hover:text-white transition-colors">哔哩哔哩专区</a></li>
+            <li><a href="community.html" class="hover:text-white transition-colors" data-page="玩家社区页面">玩家社区</a></li>
+            <li><a href="edit-guide.html" class="hover:text-white transition-colors" data-page="Wiki编辑指南页面">Wiki编辑指南</a></li>
+            <li><a href="faq.html" class="hover:text-white transition-colors" data-page="常见问题页面">常见问题</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="font-medium mb-4">关注我们</h4>
+          <div class="flex space-x-3 mb-4">
+            <a href="https://weibo.com" target="_blank" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+              <i class="fa-brands fa-weibo"></i>
+            </a>
+            <a href="https://bilibili.com" target="_blank" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+              <i class="fa-brands fa-bilibili"></i>
+            </a>
+            <a href="https://twitter.com" target="_blank" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+              <i class="fa-brands fa-twitter"></i>
+            </a>
+            <a href="https://discord.com" target="_blank" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+              <i class="fa-brands fa-discord"></i>
+            </a>
+          </div>
+          <p class="text-sm text-white/80">
+            扫码关注公众号，获取最新资讯
+          </p>
+          <div class="mt-3 w-24 h-24 bg-white/10 rounded flex items-center justify-center">
+            <span class="text-xs text-center">公众号二维码</span>
+          </div>
         </div>
       </div>
       
@@ -412,119 +833,98 @@
 
   <script>
     // 检查登录状态并更新UI
-    function checkLoginStatus() {
+    document.addEventListener('DOMContentLoaded', function() {
       const userInfo = localStorage.getItem('userInfo');
-      const loginButtonContainer = document.getElementById('login-button-container');
-      const userInfoContainer = document.getElementById('user-info-container');
-      const mobileLoginLink = document.getElementById('mobile-login-link');
+      const notLoggedIn = document.getElementById('not-logged-in');
+      const loggedIn = document.getElementById('logged-in');
+      const usernameDisplay = document.getElementById('username-display');
+      const userAvatar = document.getElementById('user-avatar');
       const mobileUserMenu = document.getElementById('mobile-user-menu');
       
       if (userInfo) {
-        // 已登录状态
+        // 用户已登录，显示用户信息
         const user = JSON.parse(userInfo);
-        loginButtonContainer.classList.add('hidden');
-        userInfoContainer.classList.remove('hidden');
-        mobileLoginLink.classList.add('hidden');
-        mobileUserMenu.classList.remove('hidden');
+        notLoggedIn.classList.add('hidden');
+        loggedIn.classList.remove('hidden');
+        usernameDisplay.textContent = user.username;
+        userAvatar.src = user.avatar;
+        userAvatar.alt = user.username + '的头像';
         
-        // 更新用户名显示
-        const userNameElement = userInfoContainer.querySelector('span');
-        if (userNameElement) {
-          userNameElement.textContent = user.username;
+        // 在移动端显示用户菜单
+        mobileUserMenu.classList.remove('hidden');
+      }
+      
+      // 移动端菜单切换
+      const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+      const mobileMenu = document.getElementById('mobile-menu');
+      
+      mobileMenuBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+        
+        // 切换图标
+        const icon = mobileMenuBtn.querySelector('i');
+        if (icon.classList.contains('fa-bars')) {
+          icon.classList.remove('fa-bars');
+          icon.classList.add('fa-times');
+        } else {
+          icon.classList.remove('fa-times');
+          icon.classList.add('fa-bars');
         }
-      } else {
-        // 未登录状态
-        loginButtonContainer.classList.remove('hidden');
-        userInfoContainer.classList.add('hidden');
-        mobileLoginLink.classList.remove('hidden');
-        mobileUserMenu.classList.add('hidden');
-      }
-    }
-    
-    // 退出登录
-    function logout() {
-      localStorage.removeItem('userInfo');
-      checkLoginStatus();
-      
-      // 显示退出提示
-      const toast = document.getElementById('toast');
-      toast.textContent = '已退出登录';
-      toast.classList.add('show');
-      
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 2000);
-    }
-    
-    // 移动端菜单切换
-    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-    
-    mobileMenuBtn.addEventListener('click', () => {
-      mobileMenu.classList.toggle('hidden');
-      
-      // 切换图标
-      const icon = mobileMenuBtn.querySelector('i');
-      if (icon.classList.contains('fa-bars')) {
-        icon.classList.remove('fa-bars');
-        icon.classList.add('fa-times');
-      } else {
-        icon.classList.remove('fa-times');
-        icon.classList.add('fa-bars');
-      }
-    });
-    
-    // 用户下拉菜单
-    const userDropdownBtn = document.getElementById('user-dropdown-btn');
-    const dropdownContent = document.querySelector('.dropdown-content');
-    
-    if (userDropdownBtn) {
-      userDropdownBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        dropdownContent.classList.toggle('hidden');
       });
-    }
-    
-    // 点击页面其他地方关闭下拉菜单
-    window.addEventListener('click', () => {
-      if (dropdownContent && !dropdownContent.classList.contains('hidden')) {
-        dropdownContent.classList.add('hidden');
+      
+      // 用户菜单切换
+      const userMenuBtn = document.getElementById('user-menu-btn');
+      const userMenu = document.getElementById('user-menu');
+      
+      userMenuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        userMenu.classList.toggle('show');
+      });
+      
+      // 点击其他区域关闭用户菜单
+      document.addEventListener('click', () => {
+        userMenu.classList.remove('show');
+      });
+      
+      // 退出登录功能
+      const logoutBtn = document.getElementById('logout-btn');
+      const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
+      const toast = document.getElementById('toast');
+      
+      function logout() {
+        localStorage.removeItem('userInfo');
+        toast.textContent = '已成功退出登录';
+        toast.classList.add('show');
+        
+        setTimeout(() => {
+          toast.classList.remove('show');
+          window.location.reload();
+        }, 1500);
       }
-    });
-    
-    // 退出登录按钮事件
-    const logoutBtn = document.getElementById('logout-btn');
-    const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
-    
-    if (logoutBtn) {
+      
       logoutBtn.addEventListener('click', (e) => {
         e.preventDefault();
         logout();
       });
-    }
-    
-    if (mobileLogoutBtn) {
+      
       mobileLogoutBtn.addEventListener('click', (e) => {
         e.preventDefault();
         logout();
-        mobileMenu.classList.add('hidden');
       });
-    }
-    
-    // 链接跳转处理
-    document.addEventListener('DOMContentLoaded', function() {
-      // 检查登录状态
-      checkLoginStatus();
       
-      const toast = document.getElementById('toast');
+      // 链接跳转提示
       const links = document.querySelectorAll('a[href]');
       
-      // 为所有链接添加点击事件
       links.forEach(link => {
-        // 跳过锚点链接（仅页面内跳转）
-        if (link.getAttribute('href').startsWith('#')) return;
+        // 跳过锚点链接和退出登录链接
+        if (link.getAttribute('href').startsWith('#') || link.id === 'logout-btn' || link.id === 'mobile-logout-btn') {
+          return;
+        }
         
         link.addEventListener('click', function(e) {
+          // 外部链接不添加提示
+          if (this.target === '_blank') return;
+          
           // 获取目标页面名称
           const targetPage = this.getAttribute('data-page') || '相关页面';
           
@@ -532,36 +932,36 @@
           toast.textContent = `即将跳转到：${targetPage}`;
           toast.classList.add('show');
           
-          // 短暂延迟后执行跳转
+          // 短暂延迟后隐藏提示
           setTimeout(() => {
             toast.classList.remove('show');
-          }, 500);
+          }, 1500);
         });
       });
-    });
-    
-    // 平滑滚动（针对锚点链接）
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        
-        // 关闭移动菜单（如果打开）
-        if (!mobileMenu.classList.contains('hidden')) {
-          mobileMenu.classList.add('hidden');
-          const icon = mobileMenuBtn.querySelector('i');
-          icon.classList.remove('fa-times');
-          icon.classList.add('fa-bars');
-        }
-        
-        const targetId = this.getAttribute('href');
-        const targetElement = document.querySelector(targetId);
-        
-        if (targetElement) {
-          window.scrollTo({
-            top: targetElement.offsetTop - 160,
-            behavior: 'smooth'
-          });
-        }
+      
+      // 平滑滚动（针对锚点链接）
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+          e.preventDefault();
+          
+          // 关闭移动菜单（如果打开）
+          if (!mobileMenu.classList.contains('hidden')) {
+            mobileMenu.classList.add('hidden');
+            const icon = mobileMenuBtn.querySelector('i');
+            icon.classList.remove('fa-times');
+            icon.classList.add('fa-bars');
+          }
+          
+          const targetId = this.getAttribute('href');
+          const targetElement = document.querySelector(targetId);
+          
+          if (targetElement) {
+            window.scrollTo({
+              top: targetElement.offsetTop - 160,
+              behavior: 'smooth'
+            });
+          }
+        });
       });
     });
   </script>
