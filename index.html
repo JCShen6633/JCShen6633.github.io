@@ -1,12 +1,10 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
+<html lang="zh-CN"><head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>绝区零Wiki - 哔哩哔哩游戏Wiki</title>
+  <title>绝区零</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&amp;display=swap" rel="stylesheet">
   
   <script>
     tailwind.config = {
@@ -86,6 +84,9 @@
       .user-menu.show {
         transform: scale(1);
       }
+      .character-card.hidden {
+        display: none;
+      }
     }
   </style>
 </head>
@@ -103,10 +104,10 @@
       <div class="flex flex-col md:flex-row items-center justify-between py-4">
         <!-- Logo区域 -->
         <a href="index.html" class="flex items-center mb-4 md:mb-0" data-page="首页">
-          <img src="https://picsum.photos/40/40?random=100" alt="绝区零Wiki" class="w-10 h-10 mr-3">
+          <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/a83d18045a8b47dcad30e36f1946b840~tplv-a9rns2rl98-image.image?rk3s=8e244e95&amp;rrcfp=e75484ac&amp;x-expires=1754030754&amp;x-signature=NG7uug%2BTLjLbQQweTk%2FRb5c2zLQ%3D" alt="绝区零Wiki" class="w-10 h-10 mr-3">
           <div>
             <div class="font-bold text-lg text-primary">绝区零Wiki</div>
-            <div class="text-xs text-wiki-lighttext">biliwiki.com</div>
+            <div class="text-xs text-wiki-lighttext">phaethon.site</div>
           </div>
         </a>
         
@@ -228,7 +229,7 @@
           </div>
         </div>
         <div class="md:w-1/2 flex justify-center">
-          <img src="https://picsum.photos/600/300?random=10" alt="绝区零宣传图" class="rounded-lg shadow-lg max-w-full h-auto">
+          <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/6cdc393b3d794f5090829aa20262ed2a~tplv-a9rns2rl98-image.image?rk3s=8e244e95&amp;rrcfp=e75484ac&amp;x-expires=1754029437&amp;x-signature=%2Fc6FnxdOQ%2FV5%2FC4F5bcq51AD%2FKg%3D" alt="绝区零宣传图" class="rounded-lg shadow-lg max-w-full h-auto">
         </div>
       </div>
     </div>
@@ -265,7 +266,7 @@
           
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             <!-- 角色卡片1 -->
-            <div class="wiki-hover bg-white rounded-lg border border-wiki-border overflow-hidden">
+            <div class="wiki-hover bg-white rounded-lg border border-wiki-border overflow-hidden character-card" data-faction="狡兔屋">
               <a href="characters/ambrose.html" data-page="安比·德玛拉斯特详情页">
                 <div class="relative">
                   <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/23bd130b9cc442ee8862dd5243005e40~tplv-a9rns2rl98-image.image?rk3s=8e244e95&amp;rrcfp=e75484ac&amp;x-expires=1753841020&amp;x-signature=4l0FnP56vofI8X%2FT%2FeSxOH9HZIU%3D" alt="安比·德玛拉斯特" class="w-full aspect-square object-cover">
@@ -279,7 +280,7 @@
             </div>
             
             <!-- 角色卡片2 -->
-            <div class="wiki-hover bg-white rounded-lg border border-wiki-border overflow-hidden">
+            <div class="wiki-hover bg-white rounded-lg border border-wiki-border overflow-hidden character-card" data-faction="狡兔屋">
               <a href="characters/billy.html" data-page="比利·奇德详情页">
                 <div class="relative">
                   <img src="https://p9-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/3728a586e8a244d7bc3d3d251a659124~tplv-a9rns2rl98-image.image?rk3s=8e244e95&amp;rrcfp=e75484ac&amp;x-expires=1753841087&amp;x-signature=gLg5dRTgifQ%2Bv9Ac1IcmjcKGPZ8%3D" alt="比利·奇德" class="w-full aspect-square object-cover">
@@ -293,7 +294,7 @@
             </div>
             
             <!-- 角色卡片3 -->
-            <div class="wiki-hover bg-white rounded-lg border border-wiki-border overflow-hidden">
+            <div class="wiki-hover bg-white rounded-lg border border-wiki-border overflow-hidden character-card" data-faction="对空六课">
               <a href="characters/cangjiao.html" data-page="苍角详情页">
                 <div class="relative">
                   <img src="https://picsum.photos/200/200?random=22" alt="苍角" class="w-full aspect-square object-cover">
@@ -307,7 +308,7 @@
             </div>
             
             <!-- 角色卡片4 -->
-            <div class="wiki-hover bg-white rounded-lg border border-wiki-border overflow-hidden">
+            <div class="wiki-hover bg-white rounded-lg border border-wiki-border overflow-hidden character-card" data-faction="狡兔屋">
               <a href="characters/nicole.html" data-page="妮可·德玛拉斯特详情页">
                 <div class="relative">
                   <img src="https://picsum.photos/200/200?random=23" alt="妮可·德玛拉斯特" class="w-full aspect-square object-cover">
@@ -321,7 +322,7 @@
             </div>
             
             <!-- 新增角色卡片5 -->
-            <div class="wiki-hover bg-white rounded-lg border border-wiki-border overflow-hidden">
+            <div class="wiki-hover bg-white rounded-lg border border-wiki-border overflow-hidden character-card" data-faction="维多利亚家政">
               <a href="characters/ailian.html" data-page="艾莲·乔详情页">
                 <div class="relative">
                   <img src="https://picsum.photos/200/200?random=24" alt="艾莲·乔" class="w-full aspect-square object-cover">
@@ -336,7 +337,7 @@
             </div>
             
             <!-- 新增角色卡片6 -->
-            <div class="wiki-hover bg-white rounded-lg border border-wiki-border overflow-hidden">
+            <div class="wiki-hover bg-white rounded-lg border border-wiki-border overflow-hidden character-card" data-faction="白祇重工">
               <a href="characters/antonin.html" data-page="安东尼详情页">
                 <div class="relative">
                   <img src="https://picsum.photos/200/200?random=25" alt="安东尼" class="w-full aspect-square object-cover">
@@ -350,7 +351,7 @@
             </div>
             
             <!-- 新增角色卡片7 -->
-            <div class="wiki-hover bg-white rounded-lg border border-wiki-border overflow-hidden">
+            <div class="wiki-hover bg-white rounded-lg border border-wiki-border overflow-hidden character-card" data-faction="对空六课">
               <a href="characters/saya.html" data-page=" Saya详情页">
                 <div class="relative">
                   <img src="https://picsum.photos/200/200?random=26" alt="Saya" class="w-full aspect-square object-cover">
@@ -364,7 +365,7 @@
             </div>
             
             <!-- 新增角色卡片8 -->
-            <div class="wiki-hover bg-white rounded-lg border border-wiki-border overflow-hidden">
+            <div class="wiki-hover bg-white rounded-lg border border-wiki-border overflow-hidden character-card" data-faction="维多利亚家政">
               <a href="characters/leon.html" data-page="莱昂详情页">
                 <div class="relative">
                   <img src="https://picsum.photos/200/200?random=27" alt="莱昂" class="w-full aspect-square object-cover">
@@ -380,13 +381,13 @@
           
           <!-- 角色筛选器 -->
           <div class="mt-4 pt-4 border-t border-wiki-border">
-            <div class="flex flex-wrap gap-2">
-              <button class="bg-primary/10 text-primary text-xs px-3 py-1 rounded-full">全部</button>
-              <button class="bg-wiki-bg text-wiki-text text-xs px-3 py-1 rounded-full hover:bg-primary/10 hover:text-primary transition-colors">维多利亚家政</button>
-              <button class="bg-wiki-bg text-wiki-text text-xs px-3 py-1 rounded-full hover:bg-primary/10 hover:text-primary transition-colors">狡兔屋</button>
-              <button class="bg-wiki-bg text-wiki-text text-xs px-3 py-1 rounded-full hover:bg-primary/10 hover:text-primary transition-colors">白祇重工</button>
-              <button class="bg-wiki-bg text-wiki-text text-xs px-3 py-1 rounded-full hover:bg-primary/10 hover:text-primary transition-colors">对空六课</button>
-              <button class="bg-wiki-bg text-wiki-text text-xs px-3 py-1 rounded-full hover:bg-primary/10 hover:text-primary transition-colors">更多筛选</button>
+            <div class="flex flex-wrap gap-2" data-doubao-line="383" data-doubao-column="13">
+              <button class="bg-primary/10 text-primary text-xs px-3 py-1 rounded-full filter-btn" data-filter="全部" data-doubao-line="384" data-doubao-column="15">全部</button>
+              <button class="bg-wiki-bg text-wiki-text text-xs px-3 py-1 rounded-full hover:bg-primary/10 hover:text-primary transition-colors filter-btn" data-filter="维多利亚家政" data-doubao-line="385" data-doubao-column="15">维多利亚家政</button>
+              <button class="bg-wiki-bg text-wiki-text text-xs px-3 py-1 rounded-full hover:bg-primary/10 hover:text-primary transition-colors filter-btn" data-filter="狡兔屋" data-doubao-line="386" data-doubao-column="15">狡兔屋</button>
+              <button class="bg-wiki-bg text-wiki-text text-xs px-3 py-1 rounded-full hover:bg-primary/10 hover:text-primary transition-colors filter-btn" data-filter="白祇重工" data-doubao-line="387" data-doubao-column="15">白祇重工</button>
+              <button class="bg-wiki-bg text-wiki-text text-xs px-3 py-1 rounded-full hover:bg-primary/10 hover:text-primary transition-colors filter-btn" data-filter="对空六课" data-doubao-line="388" data-doubao-column="15">对空六课</button>
+              <button class="bg-wiki-bg text-wiki-text text-xs px-3 py-1 rounded-full hover:bg-primary/10 hover:text-primary transition-colors filter-btn" data-filter="更多筛选" data-doubao-line="389" data-doubao-column="15">更多筛选</button>
             </div>
           </div>
         </section>
@@ -963,8 +964,65 @@
           }
         });
       });
+      
+      // 角色筛选功能
+      const filterButtons = document.querySelectorAll('.filter-btn');
+      const characterCards = document.querySelectorAll('.character-card');
+      
+      filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          // 更新按钮样式
+          filterButtons.forEach(btn => {
+            btn.classList.remove('bg-primary/10', 'text-primary');
+            btn.classList.add('bg-wiki-bg', 'text-wiki-text');
+          });
+          this.classList.remove('bg-wiki-bg', 'text-wiki-text');
+          this.classList.add('bg-primary/10', 'text-primary');
+          
+          const filter = this.getAttribute('data-filter');
+          
+          // 特殊处理"更多筛选"
+          if (filter === '更多筛选') {
+            toast.textContent = '更多筛选功能即将上线，敬请期待！';
+            toast.classList.add('show');
+            setTimeout(() => {
+              toast.classList.remove('show');
+            }, 2000);
+            
+            // 恢复"全部"按钮的选中状态
+            setTimeout(() => {
+              filterButtons.forEach(btn => {
+                btn.classList.remove('bg-primary/10', 'text-primary');
+                btn.classList.add('bg-wiki-bg', 'text-wiki-text');
+              });
+              filterButtons[0].classList.remove('bg-wiki-bg', 'text-wiki-text');
+              filterButtons[0].classList.add('bg-primary/10', 'text-primary');
+            }, 100);
+            
+            return;
+          }
+          
+          // 筛选角色卡片
+          characterCards.forEach(card => {
+            if (filter === '全部' || card.getAttribute('data-faction') === filter) {
+              card.classList.remove('hidden');
+            } else {
+              card.classList.add('hidden');
+            }
+          });
+          
+          // 显示筛选结果提示
+          const visibleCards = document.querySelectorAll('.character-card:not(.hidden)');
+          toast.textContent = `已筛选出 ${visibleCards.length} 个角色`;
+          toast.classList.add('show');
+          setTimeout(() => {
+            toast.classList.remove('show');
+          }, 1500);
+        });
+      });
     });
   </script>
-</body>
-</html>
+
+
     
+    </body></html>
