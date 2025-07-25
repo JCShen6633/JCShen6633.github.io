@@ -67,6 +67,13 @@
 </head>
 
 <body class="bg-gradient-to-br from-accent to-accent/90 min-h-screen flex items-center justify-center p-4 font-sans">
+  <!-- 检查是否已登录，如果已登录则自动跳转到首页 -->
+  <script>
+    if (localStorage.getItem('userInfo')) {
+      window.location.href = 'index.html';
+    }
+  </script>
+
   <!-- 提示弹窗 -->
   <div id="toast" class="toast-notification">
     登录成功，正在返回首页...
@@ -125,7 +132,7 @@
       <div class="pt-2">
         <div class="flex items-center justify-between mb-5">
           <label class="inline-flex items-center">
-            <input type="checkbox" class="w-4 h-4 text-primary focus:ring-primary border-wiki-border rounded">
+            <input type="checkbox" id="remember-me" class="w-4 h-4 text-primary focus:ring-primary border-wiki-border rounded">
             <span class="ml-2 text-sm text-wiki-text">记住我</span>
           </label>
         </div>
@@ -195,14 +202,33 @@
       
       const username = document.getElementById('username').value;
       const password = document.getElementById('password').value;
+      const rememberMe = document.getElementById('remember-me').checked;
       
       // 验证账号密码 (admin / 123)
       if (username === 'admin' && password === '123') {
+        // 保存用户信息到本地存储
+        const userInfo = {
+          username: username,
+          avatar: 'https://picsum.photos/40/40?random=200', // 头像URL
+          loginTime: new Date().getTime()
+        };
+        
+        localStorage.setItem('userInfo', JSON.stringify(userInfo));
+        
+        // 如果没有勾选记住我，设置会话过期时间
+        if (!rememberMe) {
+          // 设置24小时后自动清除登录状态
+          const expiryTime = 24 * 60 * 60 * 1000; // 24小时
+          setTimeout(() => {
+            localStorage.removeItem('userInfo');
+          }, expiryTime);
+        }
+        
         // 显示成功提示
         toast.textContent = '登录成功，正在返回首页...';
         toast.classList.add('show');
         
-        // 2秒后跳回首页
+        // 1.5秒后跳回首页
         setTimeout(() => {
           window.location.href = 'index.html';
         }, 1500);
