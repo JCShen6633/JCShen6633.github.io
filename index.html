@@ -1,25 +1,34 @@
-<html lang="zh-CN"><head>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>绝区零 - 游戏攻略与技巧的交汇点</title>
+  <title>绝区零Wiki - 哔哩哔哩游戏Wiki</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
   
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
-            primary: '#FF4D6D', // 绝区零主题红
-            secondary: '#4CC9F0', // 绝区零辅助蓝
-            dark: '#1A1A2E',
-            light: '#F7F7F9',
-            accent: '#7209B7',
-            muted: '#667085'
+            primary: '#E63946', // 绝区零主色调
+            secondary: '#457B9D',
+            accent: '#1D3557',
+            light: '#F1FAEE',
+            neutral: '#A8DADC',
+            wiki: {
+              bg: '#F5F5F5',
+              card: '#FFFFFF',
+              border: '#E0E0E0',
+              text: '#333333',
+              lighttext: '#666666',
+              highlight: '#FF7A45'
+            }
           },
           fontFamily: {
-            inter: ['Inter', 'sans-serif'],
+            sans: ['Noto Sans SC', 'sans-serif'],
           },
         },
       }
@@ -31,618 +40,333 @@
       .content-auto {
         content-visibility: auto;
       }
-      .text-shadow {
-        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      .wiki-shadow {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
       }
-      .text-gradient {
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+      .wiki-hover {
+        transition: all 0.2s ease;
       }
-      .animate-float {
-        animation: float 6s ease-in-out infinite;
+      .wiki-hover:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
       }
-      .animate-float-delay-1 {
-        animation: float 6s ease-in-out 1s infinite;
+      .nav-active {
+        border-bottom: 2px solid theme('colors.primary');
+        color: theme('colors.primary');
+        font-weight: 500;
       }
-      .animate-float-delay-2 {
-        animation: float 6s ease-in-out 2s infinite;
+      .animate-marquee {
+        animation: marquee 15s linear infinite;
       }
-      .scrollbar-hide::-webkit-scrollbar {
-        display: none;
+      @keyframes marquee {
+        0% { transform: translateX(100%); }
+        100% { transform: translateX(-100%); }
       }
-      .scrollbar-hide {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
+      .toast-notification {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 4px;
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.3s ease;
       }
-    }
-    
-    @keyframes float {
-      0% { transform: translateY(0px); }
-      50% { transform: translateY(-15px); }
-      100% { transform: translateY(0px); }
+      .toast-notification.show {
+        opacity: 1;
+      }
     }
   </style>
 </head>
 
-<body class="font-inter bg-light text-dark antialiased">
-  <!-- 导航栏 -->
-  <header id="navbar" class="fixed w-full z-50 transition-all duration-300 bg-transparent">
-    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-      <a href="#" class="flex items-center space-x-2">
-        <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-          <span class="text-primary font-bold text-xl">绝区</span>
+<body class="bg-wiki-bg text-wiki-text">
+  <!-- 预览提示弹窗 -->
+  <div id="toast" class="toast-notification">
+    即将跳转到：首页
+  </div>
+
+  <!-- 顶部导航栏 -->
+  <header class="bg-white border-b border-wiki-border sticky top-0 z-50">
+    <div class="container mx-auto px-4">
+      <!-- 第一行：Logo和搜索框 -->
+      <div class="flex flex-col md:flex-row items-center justify-between py-4">
+        <!-- Logo区域 -->
+        <a href="index.html" class="flex items-center" data-page="首页">
+          <img src="https://picsum.photos/40/40?random=100" alt="绝区零Wiki" class="w-10 h-10 mr-3">
+          <div>
+            <div class="font-bold text-lg text-primary">绝区零Wiki</div>
+            <div class="text-xs text-wiki-lighttext">biliwiki.com</div>
+          </div>
+        </a>
+        
+        <!-- 搜索框和登录按钮区域 -->
+        <div class="flex items-center w-full md:w-auto gap-4">
+          <!-- 搜索框 -->
+          <div class="flex items-center bg-wiki-bg rounded-full px-4 py-2 flex-grow md:flex-grow-0 md:w-64">
+            <i class="fa-solid fa-search text-wiki-lighttext mr-2"></i>
+            <input type="text" placeholder="搜索角色、武器或攻略..." class="bg-transparent outline-none text-sm w-full">
+          </div>
+          
+          <!-- 登录按钮 -->
+          <a href="login.html" class="text-sm bg-primary text-white px-5 py-2 rounded-full hover:bg-primary/90 transition-colors" data-page="登录页面">
+            登录
+          </a>
+          
+          <!-- 移动端菜单按钮 -->
+          <button id="mobile-menu-btn" class="md:hidden text-wiki-text p-2">
+            <i class="fa-solid fa-bars text-xl"></i>
+          </button>
         </div>
-        <span class="text-xl font-bold text-white text-shadow">零</span>
-      </a>
+      </div>
       
-      <!-- 桌面导航 -->
-      <nav class="hidden md:flex items-center space-x-8">
-        <a href="#home" class="text-white hover:text-secondary transition-colors font-medium">首页</a>
-        <a href="#articles" class="text-white hover:text-secondary transition-colors font-medium">攻略</a>
-        <a href="#characters" class="text-white hover:text-secondary transition-colors font-medium">角色</a>
-        <a href="#about" class="text-white hover:text-secondary transition-colors font-medium">关于</a>
-        <a href="#contact" class="bg-secondary hover:bg-secondary/90 text-white px-5 py-2 rounded-full font-medium transition-all hover:shadow-lg hover:shadow-secondary/20">联系我</a>
+      <!-- 第二行：主导航 -->
+      <nav class="hidden md:flex items-center justify-between pb-3">
+        <div class="flex space-x-8">
+          <a href="index.html" class="nav-active py-2 px-1" data-page="首页">首页</a>
+          <a href="characters.html" class="py-2 px-1 hover:text-primary transition-colors" data-page="角色页面">角色</a>
+          <a href="weapons.html" class="py-2 px-1 hover:text-primary transition-colors" data-page="武器页面">武器</a>
+          <a href="guides.html" class="py-2 px-1 hover:text-primary transition-colors" data-page="攻略页面">攻略</a>
+          <a href="lore.html" class="py-2 px-1 hover:text-primary transition-colors" data-page="剧情页面">剧情</a>
+          <a href="items.html" class="py-2 px-1 hover:text-primary transition-colors" data-page="物品页面">物品</a>
+        </div>
+        
+        <!-- 右侧快捷链接 -->
+        <div class="flex space-x-6">
+          <a href="news.html" class="text-sm hover:text-primary transition-colors" data-page="新闻页面">新闻</a>
+          <a href="community.html" class="text-sm hover:text-primary transition-colors" data-page="社区页面">社区</a>
+          <a href="download.html" class="text-sm hover:text-primary transition-colors" data-page="下载页面">下载游戏</a>
+        </div>
       </nav>
-      
-      <!-- 移动端菜单按钮 -->
-      <button id="menu-toggle" class="md:hidden text-white text-2xl">
-        <i class="fa-solid fa-bars"></i>
-      </button>
     </div>
     
     <!-- 移动端导航菜单 -->
-    <div id="mobile-menu" class="md:hidden hidden bg-white shadow-lg absolute w-full transition-all duration-300">
-      <div class="container mx-auto px-4 py-3 flex flex-col space-y-4">
-        <a href="#home" class="text-dark hover:text-primary transition-colors font-medium py-2">首页</a>
-        <a href="#articles" class="text-dark hover:text-primary transition-colors font-medium py-2">攻略</a>
-        <a href="#characters" class="text-dark hover:text-primary transition-colors font-medium py-2">角色</a>
-        <a href="#about" class="text-dark hover:text-primary transition-colors font-medium py-2">关于</a>
-        <a href="#contact" class="bg-secondary hover:bg-secondary/90 text-white px-5 py-2 rounded-full font-medium transition-all text-center">联系我</a>
+    <div id="mobile-menu" class="md:hidden hidden border-t border-wiki-border bg-white">
+      <div class="container mx-auto px-4 py-3">
+        <nav class="flex flex-col space-y-3 pb-2">
+          <a href="index.html" class="py-2 nav-active" data-page="首页">首页</a>
+          <a href="characters.html" class="py-2 hover:text-primary transition-colors" data-page="角色页面">角色</a>
+          <a href="weapons.html" class="py-2 hover:text-primary transition-colors" data-page="武器页面">武器</a>
+          <a href="guides.html" class="py-2 hover:text-primary transition-colors" data-page="攻略页面">攻略</a>
+          <a href="lore.html" class="py-2 hover:text-primary transition-colors" data-page="剧情页面">剧情</a>
+          <a href="items.html" class="py-2 hover:text-primary transition-colors" data-page="物品页面">物品</a>
+          <a href="news.html" class="py-2 hover:text-primary transition-colors" data-page="新闻页面">新闻</a>
+          <a href="community.html" class="py-2 hover:text-primary transition-colors" data-page="社区页面">社区</a>
+          <a href="download.html" class="py-2 hover:text-primary transition-colors" data-page="下载页面">下载游戏</a>
+          <a href="login.html" class="py-2 text-primary" data-page="登录页面">登录/注册</a>
+        </nav>
       </div>
     </div>
   </header>
 
-  <!-- 英雄区域 -->
-  <section id="home" class="min-h-screen relative flex items-center justify-center overflow-hidden">
-    <!-- 背景装饰 -->
-    <div class="absolute inset-0 bg-gradient-to-br from-dark to-primary/80 z-0"></div>
-    <div class="absolute inset-0 overflow-hidden">
-      <div class="absolute top-10 left-10 w-64 h-64 rounded-full bg-accent/20 blur-3xl animate-float"></div>
-      <div class="absolute bottom-20 right-10 w-80 h-80 rounded-full bg-secondary/20 blur-3xl animate-float-delay-1"></div>
-      <div class="absolute top-1/3 right-1/4 w-40 h-40 rounded-full bg-primary/30 blur-3xl animate-float-delay-2"></div>
-    </div>
-    
-    <div class="container mx-auto px-4 z-10 pt-20">
-      <div class="max-w-4xl mx-auto text-center">
-        <div class="inline-block px-4 py-1 rounded-full bg-white/10 backdrop-blur-sm text-white text-sm font-medium mb-6">
-          <span class="animate-pulse">🎮</span> 绝区零 | 攻略 | 角色 | 技巧
+  <!-- 主横幅 -->
+  <section class="bg-accent text-white">
+    <div class="container mx-auto px-4 py-8 md:py-12">
+      <div class="flex flex-col md:flex-row items-center">
+        <div class="md:w-1/2 mb-6 md:mb-0">
+          <h1 class="text-[clamp(1.75rem,5vw,2.5rem)] font-bold mb-3">绝区零</h1>
+          <p class="text-light/90 mb-6 max-w-md">
+            由米哈游开发的动作角色扮演游戏，故事发生在被"空洞灾害"侵袭的近未来城市"新艾利都"，玩家将作为代理人，带领各种能力的角色对抗空洞灾害。
+          </p>
+          <div class="flex flex-wrap gap-3">
+            <a href="game-intro.html" class="bg-primary hover:bg-primary/90 text-white px-5 py-2 rounded-full text-sm font-medium transition-colors" data-page="游戏介绍页面">
+              游戏介绍
+            </a>
+            <a href="news.html" class="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border border-white/30 px-5 py-2 rounded-full text-sm font-medium transition-colors" data-page="最新资讯页面">
+              最新资讯
+            </a>
+          </div>
         </div>
-        <h1 class="text-[clamp(2.5rem,6vw,4.5rem)] font-bold text-white leading-tight mb-6">
-          探索 <span class="bg-gradient-to-r from-secondary to-primary text-gradient">绝区零</span> 世界
-        </h1>
-        <p class="text-[clamp(1rem,2vw,1.25rem)] text-white/90 mb-10 max-w-2xl mx-auto">
-          分享最新绝区零攻略、角色培养、隐藏玩法与战斗技巧的专业博客，助你在新艾利都成为顶尖代理人。
-        </p>
-        <div class="flex flex-wrap justify-center gap-4">
-          <a href="#articles" class="bg-white text-primary hover:bg-white/90 px-8 py-3 rounded-full font-medium transition-all hover:shadow-lg hover:shadow-white/20">
-            浏览攻略 <i class="fa-solid fa-arrow-right ml-2"></i>
-          </a>
-          <a href="#characters" class="bg-transparent border-2 border-white text-white hover:bg-white/10 px-8 py-3 rounded-full font-medium transition-all">
-            角色图鉴 <i class="fa-solid fa-user-group ml-2"></i>
-          </a>
+        <div class="md:w-1/2 flex justify-center">
+          <img src="https://picsum.photos/600/300?random=10" alt="绝区零宣传图" class="rounded-lg shadow-lg max-w-full h-auto">
         </div>
-      </div>
-      
-      <!-- 滚动提示 -->
-      <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-white animate-bounce">
-        <span class="block text-sm mb-2">向下滚动</span>
-        <i class="fa-solid fa-chevron-down"></i>
       </div>
     </div>
   </section>
 
-  <!-- 绝区零攻略 -->
-  <section id="articles" class="py-24 bg-light">
+  <!-- 公告栏 -->
+  <section class="bg-white border-b border-wiki-border py-3">
     <div class="container mx-auto px-4">
-      <div class="text-center mb-16">
-        <h2 class="text-[clamp(1.75rem,4vw,2.5rem)] font-bold mb-4">绝区零 <span class="text-primary">攻略</span></h2>
-        <p class="text-muted max-w-2xl mx-auto">探索最新的绝区零攻略、隐藏技巧和玩法心得，让我们一起成为顶尖代理人。</p>
-      </div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <!-- 攻略卡片 1 -->
-        <article class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group">
-          <div class="relative h-56 overflow-hidden">
-            <img src="https://picsum.photos/800/600?random=10" alt="绝区零主线任务攻略" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-            <div class="absolute top-4 left-4 bg-primary text-white text-xs font-medium px-3 py-1 rounded-full">
-              主线任务
-            </div>
+      <div class="flex items-center">
+        <div class="bg-primary/10 text-primary text-xs font-medium px-2.5 py-1 rounded mr-3">公告</div>
+        <div class="flex-1 overflow-hidden">
+          <div class="whitespace-nowrap animate-marquee">
+            「绝区零1.2版本「深巢回响」更新公告」- 新角色「艾莲·乔」「比利·奇德」登场 - 全新玩法「深巢探索」开放 - 角色平衡性调整说明 - 维护补偿：石英*3000
           </div>
-          <div class="p-6">
-            <h3 class="text-xl font-bold mb-3 group-hover:text-primary transition-colors">绝区零主线任务全流程攻略</h3>
-            <p class="text-muted mb-4 line-clamp-3">详细解析绝区零主线剧情与任务流程，包含关键选择点、隐藏对话触发条件及BOSS战技巧...</p>
-            <div class="flex justify-between items-center">
-              <div class="flex items-center space-x-2">
-                <img src="https://picsum.photos/40/40?random=100" alt="作者头像" class="w-8 h-8 rounded-full">
-                <span class="text-sm text-muted">代理人</span>
-              </div>
-              <span class="text-sm text-muted"><i class="fa-regular fa-calendar mr-1"></i> 2025-07-15</span>
-            </div>
-          </div>
-        </article>
-        
-        <!-- 攻略卡片 2 -->
-        <article class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group">
-          <div class="relative h-56 overflow-hidden">
-            <img src="https://picsum.photos/800/600?random=11" alt="绝区零角色培养攻略" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-            <div class="absolute top-4 left-4 bg-secondary text-white text-xs font-medium px-3 py-1 rounded-full">
-              角色培养
-            </div>
-          </div>
-          <div class="p-6">
-            <h3 class="text-xl font-bold mb-3 group-hover:text-primary transition-colors">绝区零角色培养优先级与资源分配</h3>
-            <p class="text-muted mb-4 line-clamp-3">全面分析各角色强度与培养价值，推荐最优养成路线，帮助新手合理分配有限资源...</p>
-            <div class="flex justify-between items-center">
-              <div class="flex items-center space-x-2">
-                <img src="https://picsum.photos/40/40?random=101" alt="作者头像" class="w-8 h-8 rounded-full">
-                <span class="text-sm text-muted">培养大师</span>
-              </div>
-              <span class="text-sm text-muted"><i class="fa-regular fa-calendar mr-1"></i> 2025-07-10</span>
-            </div>
-          </div>
-        </article>
-        
-        <!-- 攻略卡片 3 -->
-        <article class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group">
-          <div class="relative h-56 overflow-hidden">
-            <img src="https://picsum.photos/800/600?random=12" alt="绝区零副本攻略" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-            <div class="absolute top-4 left-4 bg-accent text-white text-xs font-medium px-3 py-1 rounded-full">
-              副本攻略
-            </div>
-          </div>
-          <div class="p-6">
-            <h3 class="text-xl font-bold mb-3 group-hover:text-primary transition-colors">绝区零特殊副本高效通关指南</h3>
-            <p class="text-muted mb-4 line-clamp-3">揭秘各特殊副本机制与难点，提供最优队伍配置与操作技巧，轻松获取高额奖励...</p>
-            <div class="flex justify-between items-center">
-              <div class="flex items-center space-x-2">
-                <img src="https://picsum.photos/40/40?random=102" alt="作者头像" class="w-8 h-8 rounded-full">
-                <span class="text-sm text-muted">副本专家</span>
-              </div>
-              <span class="text-sm text-muted"><i class="fa-regular fa-calendar mr-1"></i> 2025-07-05</span>
-            </div>
-          </div>
-        </article>
-      </div>
-      
-      <div class="text-center mt-12">
-        <a href="#" class="inline-flex items-center text-primary font-medium hover:text-primary/80 transition-colors">
-          查看更多攻略 <i class="fa-solid fa-long-arrow-right ml-2"></i>
+        </div>
+        <a href="announcements.html" class="text-wiki-lighttext text-sm ml-3 hidden md:block" data-page="公告页面">
+          更多 <i class="fa-solid fa-angle-right ml-1"></i>
         </a>
       </div>
     </div>
   </section>
 
-  <!-- 绝区零角色 -->
-  <section id="characters" class="py-24 bg-gray-50">
-    <div class="container mx-auto px-4">
-      <div class="text-center mb-16">
-        <h2 class="text-[clamp(1.75rem,4vw,2.5rem)] font-bold mb-4">绝区零 <span class="text-primary">角色</span></h2>
-        <p class="text-muted max-w-2xl mx-auto">探索绝区零中的各个角色，了解他们的技能、特性和最佳使用方式。</p>
-      </div>
-      
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- 角色卡片 1 -->
-        <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 group">
-          <div class="relative">
-            <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/23bd130b9cc442ee8862dd5243005e40~tplv-a9rns2rl98-image.image?rk3s=8e244e95&amp;rrcfp=e75484ac&amp;x-expires=1753841020&amp;x-signature=4l0FnP56vofI8X%2FT%2FeSxOH9HZIU%3D" alt="安比·德玛拉斯特" class="w-full h-64 object-cover object-top">
-            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-              <h3 class="text-white font-bold text-lg">安比·德玛拉斯特</h3>
-              <p class="text-white/80 text-sm">狡兔屋</p>
-            </div>
+  <!-- 主内容区 -->
+  <main class="container mx-auto px-4 py-6 md:py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <!-- 左侧主内容 -->
+      <div class="lg:col-span-8">
+        <!-- 角色快速导航 -->
+        <section id="characters" class="bg-white rounded-xl p-4 md:p-5 mb-6 wiki-shadow">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-bold">角色图鉴</h2>
+            <a href="characters.html" class="text-primary text-sm hover:underline" data-page="角色列表页面">查看全部</a>
           </div>
-          <div class="p-4">
-            <div class="flex justify-between items-center mb-3">
-              <span class="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">远程</span>
-              <span class="px-2 py-1 bg-secondary/10 text-secondary text-xs rounded-full">五星</span>
-            </div>
-            <p class="text-muted text-sm line-clamp-3">
-              狡兔屋的代理人，使用狙击步枪作为武器，擅长远程精准打击和弱点攻击。
-            </p>
-          </div>
-        </div>
-        
-        <!-- 角色卡片 2 -->
-        <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 group">
-          <div class="relative">
-            <img src="https://p9-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/3728a586e8a244d7bc3d3d251a659124~tplv-a9rns2rl98-image.image?rk3s=8e244e95&amp;rrcfp=e75484ac&amp;x-expires=1753841087&amp;x-signature=gLg5dRTgifQ%2Bv9Ac1IcmjcKGPZ8%3D" alt="比利·奇德" class="w-full h-64 object-cover object-top">
-            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-              <h3 class="text-white font-bold text-lg">比利·奇德</h3>
-              <p class="text-white/80 text-sm">狡兔屋</p>
-            </div>
-          </div>
-          <div class="p-4">
-            <div class="flex justify-between items-center mb-3">
-              <span class="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">近战</span>
-              <span class="px-2 py-1 bg-secondary/10 text-secondary text-xs rounded-full">四星</span>
-            </div>
-            <p class="text-muted text-sm line-clamp-3">
-              狡兔屋的成员，使用双枪作为武器，擅长快速连击和近距离作战。
-            </p>
-          </div>
-        </div>
-        
-        <!-- 角色卡片 3 -->
-        <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 group">
-          <div class="relative">
-            <img src="https://picsum.photos/400/500?random=22" alt="苍角" class="w-full h-64 object-cover object-top">
-            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-              <h3 class="text-white font-bold text-lg">苍角</h3>
-              <p class="text-white/80 text-sm">白祇重工</p>
-            </div>
-          </div>
-          <div class="p-4">
-            <div class="flex justify-between items-center mb-3">
-              <span class="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">坦克</span>
-              <span class="px-2 py-1 bg-secondary/10 text-secondary text-xs rounded-full">五星</span>
-            </div>
-            <p class="text-muted text-sm line-clamp-3">
-              白祇重工的成员，使用巨型武器，拥有强大的防御能力和范围攻击。
-            </p>
-          </div>
-        </div>
-        
-        <!-- 角色卡片 4 -->
-        <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 group">
-          <div class="relative">
-            <img src="https://picsum.photos/400/500?random=23" alt="妮可·德玛拉斯特" class="w-full h-64 object-cover object-top">
-            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-              <h3 class="text-white font-bold text-lg">妮可·德玛拉斯特</h3>
-              <p class="text-white/80 text-sm">狡兔屋</p>
-            </div>
-          </div>
-          <div class="p-4">
-            <div class="flex justify-between items-center mb-3">
-              <span class="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">辅助</span>
-              <span class="px-2 py-1 bg-secondary/10 text-secondary text-xs rounded-full">四星</span>
-            </div>
-            <p class="text-muted text-sm line-clamp-3">
-              狡兔屋的负责人，擅长支援和治疗，能够为团队提供持续的增益效果。
-            </p>
-          </div>
-        </div>
-      </div>
-      
-      <div class="text-center mt-12">
-        <a href="#" class="inline-flex items-center text-primary font-medium hover:text-primary/80 transition-colors">
-          查看全部角色 <i class="fa-solid fa-long-arrow-right ml-2"></i>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- 关于绝区零 -->
-  <section id="about" class="py-24 bg-white">
-    <div class="container mx-auto px-4">
-      <div class="max-w-5xl mx-auto">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div class="relative">
-            <div class="absolute -top-6 -left-6 w-64 h-64 rounded-full bg-primary/10 -z-10"></div>
-            <div class="absolute -bottom-6 -right-6 w-64 h-64 rounded-full bg-secondary/10 -z-10"></div>
-            <img src="https://picsum.photos/600/700?random=5" alt="绝区零游戏截图" class="w-full h-auto rounded-2xl shadow-xl">
-            <div class="absolute -bottom-4 -right-4 bg-white p-4 rounded-xl shadow-lg">
-              <div class="flex items-center space-x-4">
-                <div class="text-center">
-                  <div class="text-2xl font-bold text-primary">50+</div>
-                  <div class="text-sm text-muted">攻略</div>
+          
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            <!-- 角色卡片1 -->
+            <div class="wiki-hover bg-white rounded-lg border border-wiki-border overflow-hidden">
+              <a href="characters/ambrose.html" data-page="安比·德玛拉斯特详情页">
+                <div class="relative">
+                  <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/23bd130b9cc442ee8862dd5243005e40~tplv-a9rns2rl98-image.image?rk3s=8e244e95&amp;rrcfp=e75484ac&amp;x-expires=1753841020&amp;x-signature=4l0FnP56vofI8X%2FT%2FeSxOH9HZIU%3D" alt="安比·德玛拉斯特" class="w-full aspect-square object-cover">
+                  <div class="absolute top-1 right-1 bg-primary text-white text-xs px-1.5 py-0.5 rounded">S</div>
                 </div>
-                <div class="text-center">
-                  <div class="text-2xl font-bold text-primary">20+</div>
-                  <div class="text-sm text-muted">角色</div>
+                <div class="p-2 text-center">
+                  <div class="font-medium text-sm truncate">安比·德玛拉斯特</div>
+                  <div class="text-xs text-wiki-lighttext">狡兔屋 / 远程</div>
                 </div>
-                <div class="text-center">
-                  <div class="text-2xl font-bold text-primary">100k+</div>
-                  <div class="text-sm text-muted">玩家</div>
+              </a>
+            </div>
+            
+            <!-- 角色卡片2 -->
+            <div class="wiki-hover bg-white rounded-lg border border-wiki-border overflow-hidden">
+              <a href="characters/billy.html" data-page="比利·奇德详情页">
+                <div class="relative">
+                  <img src="https://p9-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/3728a586e8a244d7bc3d3d251a659124~tplv-a9rns2rl98-image.image?rk3s=8e244e95&amp;rrcfp=e75484ac&amp;x-expires=1753841087&amp;x-signature=gLg5dRTgifQ%2Bv9Ac1IcmjcKGPZ8%3D" alt="比利·奇德" class="w-full aspect-square object-cover">
+                  <div class="absolute top-1 right-1 bg-secondary text-white text-xs px-1.5 py-0.5 rounded">4</div>
                 </div>
-              </div>
+                <div class="p-2 text-center">
+                  <div class="font-medium text-sm truncate">比利·奇德</div>
+                  <div class="text-xs text-wiki-lighttext">狡兔屋 / 近战</div>
+                </div>
+              </a>
+            </div>
+            
+            <!-- 角色卡片3 -->
+            <div class="wiki-hover bg-white rounded-lg border border-wiki-border overflow-hidden">
+              <a href="characters/cangjiao.html" data-page="苍角详情页">
+                <div class="relative">
+                  <img src="https://picsum.photos/200/200?random=22" alt="苍角" class="w-full aspect-square object-cover">
+                  <div class="absolute top-1 right-1 bg-secondary text-white text-xs px-1.5 py-0.5 rounded">4</div>
+                </div>
+                <div class="p-2 text-center">
+                  <div class="font-medium text-sm truncate">苍角</div>
+                  <div class="text-xs text-wiki-lighttext">对空六课 / 坦克</div>
+                </div>
+              </a>
+            </div>
+            
+            <!-- 角色卡片4 -->
+            <div class="wiki-hover bg-white rounded-lg border border-wiki-border overflow-hidden">
+              <a href="characters/nicole.html" data-page="妮可·德玛拉斯特详情页">
+                <div class="relative">
+                  <img src="https://picsum.photos/200/200?random=23" alt="妮可·德玛拉斯特" class="w-full aspect-square object-cover">
+                  <div class="absolute top-1 right-1 bg-secondary text-white text-xs px-1.5 py-0.5 rounded">4</div>
+                </div>
+                <div class="p-2 text-center">
+                  <div class="font-medium text-sm truncate">妮可·德玛拉斯特</div>
+                  <div class="text-xs text-wiki-lighttext">狡兔屋 / 辅助</div>
+                </div>
+              </a>
             </div>
           </div>
           
-          <div>
-            <h2 class="text-[clamp(1.75rem,4vw,2.5rem)] font-bold mb-6">关于 <span class="text-primary">绝区零</span></h2>
-            <p class="text-muted mb-6 leading-relaxed">
-              《绝区零》是由miHoYo开发的一款动作角色扮演游戏，故事发生在被称为"空洞灾害"侵袭的近未来城市"新艾利都"。玩家将扮演一家小型代理人事务所的负责人，带领团队处理各种与空洞相关的事件。
-            </p>
-            <p class="text-muted mb-6 leading-relaxed">
-              游戏采用快节奏的即时战斗系统，玩家可以组建由不同角色组成的小队，利用他们各自的技能和武器特点，应对各种挑战。游戏的剧情丰富，角色个性鲜明，世界观独特。
-            </p>
-            <p class="text-muted mb-8 leading-relaxed">
-              本博客致力于为玩家提供最新、最全面的绝区零攻略，包括角色培养、副本攻略、剧情解析等内容，帮助玩家更好地了解和享受这款游戏。
-            </p>
-            
-            <div class="mb-8">
-              <h3 class="text-lg font-bold mb-4">热门内容</h3>
-              <div class="grid grid-cols-2 gap-4">
-                <div class="flex items-center">
-                  <div class="w-3 h-3 rounded-full bg-primary mr-3"></div>
-                  <span>角色培养攻略</span>
-                </div>
-                <div class="flex items-center">
-                  <div class="w-3 h-3 rounded-full bg-primary mr-3"></div>
-                  <span>副本通关技巧</span>
-                </div>
-                <div class="flex items-center">
-                  <div class="w-3 h-3 rounded-full bg-primary mr-3"></div>
-                  <span>武器选择推荐</span>
-                </div>
-                <div class="flex items-center">
-                  <div class="w-3 h-3 rounded-full bg-primary mr-3"></div>
-                  <span>剧情解析</span>
-                </div>
-                <div class="flex items-center">
-                  <div class="w-3 h-3 rounded-full bg-primary mr-3"></div>
-                  <span>角色故事</span>
-                </div>
-                <div class="flex items-center">
-                  <div class="w-3 h-3 rounded-full bg-primary mr-3"></div>
-                  <span>最新资讯</span>
-                </div>
-              </div>
-            </div>
-            
-            <div class="flex space-x-4">
-              <a href="#" class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-colors">
-                <i class="fa-brands fa-github"></i>
-              </a>
-              <a href="#" class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-colors">
-                <i class="fa-brands fa-twitter"></i>
-              </a>
-              <a href="#" class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-colors">
-                <i class="fa-brands fa-youtube"></i>
-              </a>
-              <a href="#" class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-colors">
-                <i class="fa-brands fa-bilibili"></i>
-              </a>
+          <!-- 角色筛选器 -->
+          <div class="mt-4 pt-4 border-t border-wiki-border">
+            <div class="flex flex-wrap gap-2">
+              <button class="bg-primary/10 text-primary text-xs px-3 py-1 rounded-full">全部</button>
+              <button class="bg-wiki-bg text-wiki-text text-xs px-3 py-1 rounded-full hover:bg-primary/10 hover:text-primary transition-colors">维多利亚家政</button>
+              <button class="bg-wiki-bg text-wiki-text text-xs px-3 py-1 rounded-full hover:bg-primary/10 hover:text-primary transition-colors">狡兔屋</button>
+              <button class="bg-wiki-bg text-wiki-text text-xs px-3 py-1 rounded-full hover:bg-primary/10 hover:text-primary transition-colors">白祇重工</button>
+              <button class="bg-wiki-bg text-wiki-text text-xs px-3 py-1 rounded-full hover:bg-primary/10 hover:text-primary transition-colors">对空六课</button>
+              <button class="bg-wiki-bg text-wiki-text text-xs px-3 py-1 rounded-full hover:bg-primary/10 hover:text-primary transition-colors">更多筛选</button>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 订阅区域 -->
-  <section class="py-20 bg-gradient-to-r from-primary to-accent text-white">
-    <div class="container mx-auto px-4">
-      <div class="max-w-3xl mx-auto text-center">
-        <h2 class="text-[clamp(1.75rem,4vw,2.5rem)] font-bold mb-4">订阅我的<span class="text-secondary">绝区零周刊</span></h2>
-        <p class="text-white/80 mb-8">
-          获取最新的绝区零攻略、角色解析和游戏资讯，每周直接发送到你的邮箱。
-        </p>
-        <form class="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
-          <input type="email" placeholder="输入你的邮箱地址" class="flex-grow px-5 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-white/30 text-dark">
-          <button type="submit" class="bg-secondary hover:bg-secondary/90 text-white px-8 py-3 rounded-full font-medium transition-all hover:shadow-lg hover:shadow-secondary/20 whitespace-nowrap">
-            立即订阅 <i class="fa-solid fa-paper-plane ml-2"></i>
-          </button>
-        </form>
-        <p class="text-white/60 text-sm mt-4">
-          我们尊重你的隐私，不会向第三方分享你的信息。
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- 联系区域 -->
-  <section id="contact" class="py-24 bg-light">
-    <div class="container mx-auto px-4">
-      <div class="text-center mb-16">
-        <h2 class="text-[clamp(1.75rem,4vw,2.5rem)] font-bold mb-4">与我<span class="text-primary">联系</span></h2>
-        <p class="text-muted max-w-2xl mx-auto">
-          有任何绝区零相关问题、攻略建议或合作机会？请随时联系我，我会尽快回复。
-        </p>
-      </div>
-      
-      <div class="max-w-5xl mx-auto">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-          <div>
-            <form class="space-y-6">
-              <div>
-                <label for="name" class="block text-sm font-medium text-muted mb-1">姓名</label>
-                <input type="text" id="name" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors">
-              </div>
-              <div>
-                <label for="email" class="block text-sm font-medium text-muted mb-1">邮箱</label>
-                <input type="email" id="email" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors">
-              </div>
-              <div>
-                <label for="subject" class="block text-sm font-medium text-muted mb-1">问题类型</label>
-                <input type="text" id="subject" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors" placeholder="例如：角色培养、副本攻略等">
-              </div>
-              <div>
-                <label for="message" class="block text-sm font-medium text-muted mb-1">问题详情</label>
-                <textarea id="message" rows="5" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors"></textarea>
-              </div>
-              <button type="submit" class="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-lg font-medium transition-all hover:shadow-lg hover:shadow-primary/20 w-full md:w-auto">
-                发送消息 <i class="fa-solid fa-paper-plane ml-2"></i>
-              </button>
-            </form>
+        </section>
+        
+        <!-- 最新攻略 -->
+        <section id="guides" class="bg-white rounded-xl p-4 md:p-5 mb-6 wiki-shadow">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-bold">最新攻略</h2>
+            <a href="guides.html" class="text-primary text-sm hover:underline" data-page="攻略列表页面">更多攻略</a>
           </div>
           
-          <div>
-            <div class="bg-white p-8 rounded-2xl shadow-lg h-full">
-              <h3 class="text-xl font-bold mb-6">联系方式</h3>
-              
-              <div class="space-y-6">
-                <div class="flex items-start">
-                  <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mr-4 mt-1 flex-shrink-0">
-                    <i class="fa-solid fa-envelope"></i>
-                  </div>
-                  <div>
-                    <h4 class="font-medium mb-1">邮箱</h4>
-                    <p class="text-muted">contact@juequling.com</p>
-                  </div>
+          <div class="space-y-4">
+            <!-- 攻略条目1 -->
+            <div class="flex flex-col md:flex-row gap-4 p-3 rounded-lg hover:bg-wiki-bg transition-colors">
+              <a href="guides/ailian-guide.html" data-page="艾莲·乔攻略页面">
+                <img src="https://picsum.photos/200/120?random=30" alt="艾莲攻略缩略图" class="md:w-48 h-28 object-cover rounded-lg flex-shrink-0">
+              </a>
+              <div class="flex-1">
+                <a href="guides/ailian-guide.html" class="font-medium mb-1 hover:text-primary transition-colors" data-page="艾莲·乔攻略页面">
+                  <h3>1.2版本新角色「艾莲·乔」全面解析与培养指南</h3>
+                </a>
+                <p class="text-sm text-wiki-lighttext line-clamp-2 mb-2">详细分析新角色艾莲的技能机制、最佳配队、武器选择和养成材料，艾莲作为雷属性游击手，拥有强大的范围伤害和连击能力...</p>
+                <div class="flex items-center text-xs text-wiki-lighttext">
+                  <span>2025-07-20</span>
+                  <span class="mx-2">•</span>
+                  <span>角色攻略</span>
+                  <span class="mx-2">•</span>
+                  <span>12.5k 阅读</span>
                 </div>
-                
-                <div class="flex items-start">
-                  <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mr-4 mt-1 flex-shrink-0">
-                    <i class="fa-solid fa-comment"></i>
-                  </div>
-                  <div>
-                    <h4 class="font-medium mb-1">社交账号</h4>
-                    <p class="text-muted">@juequling_guide</p>
-                  </div>
-                </div>
-                
-                <div class="flex items-start">
-                  <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mr-4 mt-1 flex-shrink-0">
-                    <i class="fa-solid fa-gamepad"></i>
-                  </div>
-                  <div>
-                    <h4 class="font-medium mb-1">游戏ID</h4>
-                    <p class="text-muted">代理人#10086</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="mt-12">
-                <h3 class="text-xl font-bold mb-6">在线时间</h3>
-                <ul class="space-y-3">
-                  <li class="flex justify-between">
-                    <span class="text-muted">周一至周五</span>
-                    <span class="font-medium">19:00 - 23:00</span>
-                  </li>
-                  <li class="flex justify-between">
-                    <span class="text-muted">周六至周日</span>
-                    <span class="font-medium">14:00 - 24:00</span>
-                  </li>
-                  <li class="flex justify-between">
-                    <span class="text-muted">版本更新日</span>
-                    <span class="font-medium">全天在线</span>
-                  </li>
-                </ul>
               </div>
             </div>
+          </div>
+        </section>
+      </div>
+      
+      <!-- 右侧边栏 -->
+      <div class="lg:col-span-4">
+        <!-- 游戏资料 -->
+        <div class="bg-white rounded-xl p-4 md:p-5 mb-6 wiki-shadow">
+          <h3 class="text-base font-bold mb-4 pb-2 border-b border-wiki-border">游戏资料</h3>
+          <div class="space-y-3">
+            <a href="lore/new-eridu.html" class="flex items-center justify-between text-sm p-2 hover:bg-wiki-bg rounded transition-colors" data-page="新艾利都区域介绍页面">
+              <div class="flex items-center">
+                <i class="fa-solid fa-map-marker-alt text-secondary mr-2 w-5 text-center"></i>
+                <span>新艾利都区域介绍</span>
+              </div>
+              <i class="fa-solid fa-angle-right text-wiki-lighttext"></i>
+            </a>
           </div>
         </div>
       </div>
     </div>
-  </section>
+  </main>
 
   <!-- 页脚 -->
-  <footer class="bg-dark text-white pt-16 pb-8">
+  <footer class="bg-accent text-white mt-12 py-8">
     <div class="container mx-auto px-4">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
-          <div class="flex items-center space-x-2 mb-6">
-            <div class="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
-              <span class="text-white font-bold text-xl">绝区</span>
-            </div>
-            <span class="text-xl font-bold">零</span>
+          <div class="flex items-center mb-4">
+            <img src="https://picsum.photos/40/40?random=100" alt="绝区零Wiki" class="w-8 h-8 mr-2">
+            <span class="font-bold">绝区零Wiki</span>
           </div>
-          <p class="text-white/70 mb-6">
-            专注于绝区零游戏攻略、角色解析和玩法技巧的专业博客，助你成为顶尖代理人。
+          <p class="text-white/80 text-sm">
+            致力于为玩家提供最全面的绝区零游戏资料和攻略
           </p>
-          <div class="flex space-x-4">
-            <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">
-              <i class="fa-brands fa-github"></i>
-            </a>
-            <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">
-              <i class="fa-brands fa-twitter"></i>
-            </a>
-            <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">
-              <i class="fa-brands fa-youtube"></i>
-            </a>
-            <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">
-              <i class="fa-brands fa-bilibili"></i>
-            </a>
-          </div>
-        </div>
-        
-        <div>
-          <h4 class="text-lg font-bold mb-6">快速链接</h4>
-          <ul class="space-y-3">
-            <li><a href="#home" class="text-white/70 hover:text-white transition-colors">首页</a></li>
-            <li><a href="#articles" class="text-white/70 hover:text-white transition-colors">攻略</a></li>
-            <li><a href="#characters" class="text-white/70 hover:text-white transition-colors">角色</a></li>
-            <li><a href="#about" class="text-white/70 hover:text-white transition-colors">关于</a></li>
-            <li><a href="#contact" class="text-white/70 hover:text-white transition-colors">联系</a></li>
-          </ul>
-        </div>
-        
-        <div>
-          <h4 class="text-lg font-bold mb-6">攻略分类</h4>
-          <ul class="space-y-3">
-            <li><a href="#" class="text-white/70 hover:text-white transition-colors">角色培养</a></li>
-            <li><a href="#" class="text-white/70 hover:text-white transition-colors">副本攻略</a></li>
-            <li><a href="#" class="text-white/70 hover:text-white transition-colors">武器推荐</a></li>
-            <li><a href="#" class="text-white/70 hover:text-white transition-colors">剧情解析</a></li>
-            <li><a href="#" class="text-white/70 hover:text-white transition-colors">最新资讯</a></li>
-          </ul>
-        </div>
-        
-        <div>
-          <h4 class="text-lg font-bold mb-6">订阅</h4>
-          <p class="text-white/70 mb-4">
-            订阅我的博客，获取最新绝区零攻略和资讯。
-          </p>
-          <form class="flex">
-            <input type="email" placeholder="你的邮箱" class="flex-grow px-4 py-2 rounded-l-lg focus:outline-none text-dark">
-            <button type="submit" class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-r-lg transition-colors">
-              <i class="fa-solid fa-arrow-right"></i>
-            </button>
-          </form>
         </div>
       </div>
       
-      <div class="border-t border-white/10 pt-8">
-        <div class="flex flex-col md:flex-row justify-between items-center">
-          <p class="text-white/50 text-sm mb-4 md:mb-0">
-            © 2025 绝区零攻略站. 保留所有权利.
-          </p>
-          <div class="flex space-x-6">
-            <a href="#" class="text-white/50 hover:text-white text-sm transition-colors">隐私政策</a>
-            <a href="#" class="text-white/50 hover:text-white text-sm transition-colors">服务条款</a>
-            <a href="#" class="text-white/50 hover:text-white text-sm transition-colors">Cookie政策</a>
-          </div>
-        </div>
+      <div class="border-t border-white/20 mt-8 pt-6 text-center text-sm text-white/60">
+        <p>© 2025 绝区零Wiki 版权所有 | 本网站与miHoYo无任何关联</p>
       </div>
     </div>
   </footer>
 
-  <!-- 回到顶部按钮 -->
-  <button id="back-to-top" class="fixed bottom-8 right-8 w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center shadow-lg opacity-0 invisible transition-all z-50">
-    <i class="fa-solid fa-chevron-up"></i>
-  </button>
-
   <script>
-    // 导航栏滚动效果
-    const navbar = document.getElementById('navbar');
-    const backToTop = document.getElementById('back-to-top');
-    
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 50) {
-        navbar.classList.add('bg-dark', 'shadow-lg');
-        navbar.classList.remove('bg-transparent');
-        
-        backToTop.classList.remove('opacity-0', 'invisible');
-        backToTop.classList.add('opacity-100', 'visible');
-      } else {
-        navbar.classList.remove('bg-dark', 'shadow-lg');
-        navbar.classList.add('bg-transparent');
-        
-        backToTop.classList.add('opacity-0', 'invisible');
-        backToTop.classList.remove('opacity-100', 'visible');
-      }
-    });
-    
-    // 移动端菜单
-    const menuToggle = document.getElementById('menu-toggle');
+    // 移动端菜单切换
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
     const mobileMenu = document.getElementById('mobile-menu');
     
-    menuToggle.addEventListener('click', () => {
+    mobileMenuBtn.addEventListener('click', () => {
       mobileMenu.classList.toggle('hidden');
       
       // 切换图标
-      const icon = menuToggle.querySelector('i');
+      const icon = mobileMenuBtn.querySelector('i');
       if (icon.classList.contains('fa-bars')) {
         icon.classList.remove('fa-bars');
         icon.classList.add('fa-times');
@@ -652,39 +376,59 @@
       }
     });
     
-    // 平滑滚动
+    // 链接跳转处理
+    document.addEventListener('DOMContentLoaded', function() {
+      const toast = document.getElementById('toast');
+      const links = document.querySelectorAll('a[href]');
+      
+      // 为所有链接添加点击事件
+      links.forEach(link => {
+        // 跳过锚点链接（仅页面内跳转）
+        if (link.getAttribute('href').startsWith('#')) return;
+        
+        link.addEventListener('click', function(e) {
+          // 获取目标页面名称
+          const targetPage = this.getAttribute('data-page') || '相关页面';
+          
+          // 显示提示信息
+          toast.textContent = `即将跳转到：${targetPage}`;
+          toast.classList.add('show');
+          
+          // 短暂延迟后执行跳转
+          setTimeout(() => {
+            toast.classList.remove('show');
+            // 允许默认跳转行为
+            // 如果需要在单页应用中实现无刷新跳转，可以在这里添加自定义逻辑
+          }, 500);
+        });
+      });
+    });
+    
+    // 平滑滚动（针对锚点链接）
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       anchor.addEventListener('click', function (e) {
         e.preventDefault();
         
-        // 关闭移动菜单
+        // 关闭移动菜单（如果打开）
         if (!mobileMenu.classList.contains('hidden')) {
           mobileMenu.classList.add('hidden');
-          const icon = menuToggle.querySelector('i');
+          const icon = mobileMenuBtn.querySelector('i');
           icon.classList.remove('fa-times');
           icon.classList.add('fa-bars');
         }
         
         const targetId = this.getAttribute('href');
-        if (targetId === '#') return;
-        
         const targetElement = document.querySelector(targetId);
+        
         if (targetElement) {
-          targetElement.scrollIntoView({
+          window.scrollTo({
+            top: targetElement.offsetTop - 160,
             behavior: 'smooth'
           });
         }
       });
     });
-    
-    // 回到顶部
-    backToTop.addEventListener('click', () => {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
-    });
   </script>
-
-
-    </body></html>
+</body>
+</html>
+    
