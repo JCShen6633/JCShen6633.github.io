@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登录 - 绝区零Wiki</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#E63946', // 绝区零主色调
+            secondary: '#457B9D',
+            accent: '#1D3557',
+            light: '#F1FAEE',
+            neutral: '#A8DADC',
+            wiki: {
+              bg: '#F5F5F5',
+              card: '#FFFFFF',
+              border: '#E0E0E0',
+              text: '#333333',
+              lighttext: '#666666',
+              highlight: '#FF7A45'
+            }
+          },
+          fontFamily: {
+            sans: ['Noto Sans SC', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .login-shadow {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      }
+      .input-focus {
+        @apply focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none;
+      }
+      .toast-notification {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 4px;
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      .toast-notification.show {
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-accent to-accent/90 min-h-screen flex items-center justify-center p-4 font-sans">
+  <!-- 提示弹窗 -->
+  <div id="toast" class="toast-notification">
+    登录成功，正在返回首页...
+  </div>
+
+  <!-- 登录卡片 -->
+  <div class="w-full max-w-md bg-white rounded-2xl p-6 md:p-8 login-shadow transform transition-all">
+    <!-- Logo和标题 -->
+    <div class="text-center mb-8">
+      <div class="flex items-center justify-center mb-4">
+        <img src="https://picsum.photos/50/50?random=100" alt="绝区零Wiki" class="w-12 h-12 mr-3">
+        <div>
+          <div class="font-bold text-xl text-primary">绝区零Wiki</div>
+          <div class="text-xs text-wiki-lighttext">biliwiki.com</div>
+        </div>
+      </div>
+      <h1 class="text-2xl font-bold text-wiki-text">账号登录</h1>
+      <p class="text-sm text-wiki-lighttext mt-1">登录后可享受更多Wiki功能</p>
+    </div>
+    
+    <!-- 登录表单 -->
+    <form id="login-form" class="space-y-5">
+      <!-- 账号输入 -->
+      <div>
+        <label for="username" class="block text-sm font-medium text-wiki-text mb-1">账号</label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-wiki-lighttext">
+            <i class="fa-solid fa-user"></i>
+          </div>
+          <input type="text" id="username" name="username" 
+                 class="w-full pl-10 pr-4 py-3 border border-wiki-border rounded-lg input-focus transition-colors"
+                 placeholder="请输入账号" value="admin">
+        </div>
+      </div>
+      
+      <!-- 密码输入 -->
+      <div>
+        <div class="flex justify-between items-center mb-1">
+          <label for="password" class="block text-sm font-medium text-wiki-text">密码</label>
+          <a href="#" class="text-xs text-primary hover:underline">忘记密码?</a>
+        </div>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-wiki-lighttext">
+            <i class="fa-solid fa-lock"></i>
+          </div>
+          <input type="password" id="password" name="password" 
+                 class="w-full pl-10 pr-10 py-3 border border-wiki-border rounded-lg input-focus transition-colors"
+                 placeholder="请输入密码" value="123">
+          <button type="button" id="toggle-password" class="absolute inset-y-0 right-0 flex items-center pr-3 text-wiki-lighttext hover:text-primary transition-colors">
+            <i class="fa-solid fa-eye-slash"></i>
+          </button>
+        </div>
+      </div>
+      
+      <!-- 记住我和登录按钮 -->
+      <div class="pt-2">
+        <div class="flex items-center justify-between mb-5">
+          <label class="inline-flex items-center">
+            <input type="checkbox" class="w-4 h-4 text-primary focus:ring-primary border-wiki-border rounded">
+            <span class="ml-2 text-sm text-wiki-text">记住我</span>
+          </label>
+        </div>
+        
+        <button type="submit" class="w-full bg-primary hover:bg-primary/90 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center">
+          <span>登录</span>
+          <i class="fa-solid fa-arrow-right ml-2"></i>
+        </button>
+      </div>
+    </form>
+    
+    <!-- 分隔线和其他登录方式 -->
+    <div class="mt-8">
+      <div class="relative flex items-center">
+        <div class="flex-grow border-t border-wiki-border"></div>
+        <span class="flex-shrink mx-4 text-xs text-wiki-lighttext">其他登录方式</span>
+        <div class="flex-grow border-t border-wiki-border"></div>
+      </div>
+      
+      <div class="flex justify-center space-x-6 mt-6">
+        <a href="#" class="w-10 h-10 rounded-full bg-[#FE7A9A]/10 flex items-center justify-center text-[#FE7A9A] hover:bg-[#FE7A9A]/20 transition-colors">
+          <i class="fa-brands fa-bilibili"></i>
+        </a>
+        <a href="#" class="w-10 h-10 rounded-full bg-[#1677FF]/10 flex items-center justify-center text-[#1677FF] hover:bg-[#1677FF]/20 transition-colors">
+          <i class="fa-brands fa-weixin"></i>
+        </a>
+        <a href="#" class="w-10 h-10 rounded-full bg-[#1DA1F2]/10 flex items-center justify-center text-[#1DA1F2] hover:bg-[#1DA1F2]/20 transition-colors">
+          <i class="fa-brands fa-twitter"></i>
+        </a>
+      </div>
+    </div>
+    
+    <!-- 注册链接 -->
+    <div class="mt-8 text-center">
+      <p class="text-sm text-wiki-lighttext">
+        还没有账号? <a href="#" class="text-primary font-medium hover:underline">立即注册</a>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // 显示/隐藏密码
+    const togglePassword = document.getElementById('toggle-password');
+    const passwordInput = document.getElementById('password');
+    
+    togglePassword.addEventListener('click', () => {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      
+      // 切换图标
+      const icon = togglePassword.querySelector('i');
+      if (type === 'password') {
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      } else {
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
+    });
+    
+    // 登录表单处理
+    const loginForm = document.getElementById('login-form');
+    const toast = document.getElementById('toast');
+    
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      
+      // 验证账号密码 (admin / 123)
+      if (username === 'admin' && password === '123') {
+        // 显示成功提示
+        toast.textContent = '登录成功，正在返回首页...';
+        toast.classList.add('show');
+        
+        // 2秒后跳回首页
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 1500);
+      } else {
+        // 显示错误提示
+        toast.textContent = '账号或密码错误，请重试';
+        toast.classList.add('show');
+        
+        // 3秒后隐藏提示
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 3000);
+      }
+    });
+  </script>
+</body>
+</html>
+    
