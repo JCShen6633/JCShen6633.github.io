@@ -1,249 +1,898 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>登录 - 绝区零Wiki</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
-  
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#E63946', // 绝区零主色调
-            secondary: '#457B9D',
-            accent: '#1D3557',
-            light: '#F1FAEE',
-            neutral: '#A8DADC',
-            wiki: {
-              bg: '#F5F5F5',
-              card: '#FFFFFF',
-              border: '#E0E0E0',
-              text: '#333333',
-              lighttext: '#666666',
-              highlight: '#FF7A45'
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能照片压缩工具</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#1E40AF',
+                        accent: '#60A5FA',
+                        success: '#10B981',
+                        warning: '#F59E0B',
+                        danger: '#EF4444',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'pulse-slow': 'pulse 3s infinite',
+                        'bounce-soft': 'bounceSoft 2s infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        bounceSoft: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' }
+                        }
+                    }
+                }
             }
-          },
-          fontFamily: {
-            sans: ['Noto Sans SC', 'sans-serif'],
-          },
-        },
-      }
-    }
-  </script>
-  
-  <style type="text/tailwindcss">
-    @layer utilities {
-      .content-auto {
-        content-visibility: auto;
-      }
-      .login-shadow {
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      }
-      .input-focus {
-        @apply focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none;
-      }
-      .toast-notification {
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(0, 0, 0, 0.8);
-        color: white;
-        padding: 10px 20px;
-        border-radius: 4px;
-        z-index: 1000;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-      }
-      .toast-notification.show {
-        opacity: 1;
-      }
-    }
-  </style>
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .glass-effect {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+            .gradient-bg {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+            .card-hover {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .card-hover:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            }
+            .progress-ring {
+                transform: rotate(-90deg);
+                transform-origin: 50% 50%;
+            }
+            .progress-ring-circle {
+                transition: stroke-dasharray 0.35s;
+                transform: rotate(-90deg);
+                transform-origin: 50% 50%;
+            }
+        }
+    </style>
 </head>
 
-<body class="bg-gradient-to-br from-accent to-accent/90 min-h-screen flex items-center justify-center p-4 font-sans">
-  <!-- 检查是否已登录，如果已登录则自动跳转到首页 -->
-  <script>
-    if (localStorage.getItem('userInfo')) {
-      window.location.href = 'index.html';
-    }
-  </script>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 font-inter">
+    <!-- Header -->
+    <header class="relative overflow-hidden bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50">
+        <div class="absolute inset-0 bg-gradient-to-r from-primary/10 to-secondary/10 opacity-50"></div>
+        <div class="relative container mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center shadow-lg">
+                        <i class="fa fa-compress text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">智能照片压缩</h1>
+                        <p class="text-sm text-gray-600">高效压缩，品质无损</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                        <i class="fa fa-moon text-gray-600"></i>
+                    </button>
+                    <button id="helpBtn" class="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                        <i class="fa fa-question-circle text-gray-600"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
 
-  <!-- 提示弹窗 -->
-  <div id="toast" class="toast-notification">
-    登录成功，正在返回首页...
-  </div>
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Hero Section -->
+        <section class="text-center mb-12 animate-fade-in">
+            <h2 class="text-[clamp(2rem,4vw,3rem)] font-bold text-gray-800 mb-4">
+                快速压缩图片，<span class="text-primary">节省空间</span>
+            </h2>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto mb-8">
+                支持JPG、PNG、WebP格式，智能压缩算法保持最佳画质，所有处理在本地完成，保护隐私安全
+            </p>
+        </section>
 
-  <!-- 登录卡片 -->
-  <div class="w-full max-w-md bg-white rounded-2xl p-6 md:p-8 login-shadow transform transition-all">
-    <!-- Logo和标题 -->
-    <div class="text-center mb-8">
-      <div class="flex items-center justify-center mb-4">
-        <img src="https://picsum.photos/50/50?random=100" alt="绝区零Wiki" class="w-12 h-12 mr-3">
-        <div>
-          <div class="font-bold text-xl text-primary">绝区零Wiki</div>
-          <div class="text-xs text-wiki-lighttext">biliwiki.com</div>
-        </div>
-      </div>
-      <h1 class="text-2xl font-bold text-wiki-text">账号登录</h1>
-      <p class="text-sm text-wiki-lighttext mt-1">登录后可享受更多Wiki功能</p>
-    </div>
-    
-    <!-- 登录表单 -->
-    <form id="login-form" class="space-y-5">
-      <!-- 账号输入 -->
-      <div>
-        <label for="username" class="block text-sm font-medium text-wiki-text mb-1">账号</label>
-        <div class="relative">
-          <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-wiki-lighttext">
-            <i class="fa-solid fa-user"></i>
-          </div>
-          <input type="text" id="username" name="username" 
-                 class="w-full pl-10 pr-4 py-3 border border-wiki-border rounded-lg input-focus transition-colors"
-                 placeholder="请输入账号" value="admin">
-        </div>
-      </div>
-      
-      <!-- 密码输入 -->
-      <div>
-        <div class="flex justify-between items-center mb-1">
-          <label for="password" class="block text-sm font-medium text-wiki-text">密码</label>
-          <a href="#" class="text-xs text-primary hover:underline">忘记密码?</a>
-        </div>
-        <div class="relative">
-          <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-wiki-lighttext">
-            <i class="fa-solid fa-lock"></i>
-          </div>
-          <input type="password" id="password" name="password" 
-                 class="w-full pl-10 pr-10 py-3 border border-wiki-border rounded-lg input-focus transition-colors"
-                 placeholder="请输入密码" value="123">
-          <button type="button" id="toggle-password" class="absolute inset-y-0 right-0 flex items-center pr-3 text-wiki-lighttext hover:text-primary transition-colors">
-            <i class="fa-solid fa-eye-slash"></i>
-          </button>
-        </div>
-      </div>
-      
-      <!-- 记住我和登录按钮 -->
-      <div class="pt-2">
-        <div class="flex items-center justify-between mb-5">
-          <label class="inline-flex items-center">
-            <input type="checkbox" id="remember-me" class="w-4 h-4 text-primary focus:ring-primary border-wiki-border rounded">
-            <span class="ml-2 text-sm text-wiki-text">记住我</span>
-          </label>
-        </div>
-        
-        <button type="submit" class="w-full bg-primary hover:bg-primary/90 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center">
-          <span>登录</span>
-          <i class="fa-solid fa-arrow-right ml-2"></i>
-        </button>
-      </div>
-    </form>
-    
-    <!-- 分隔线和其他登录方式 -->
-    <div class="mt-8">
-      <div class="relative flex items-center">
-        <div class="flex-grow border-t border-wiki-border"></div>
-        <span class="flex-shrink mx-4 text-xs text-wiki-lighttext">其他登录方式</span>
-        <div class="flex-grow border-t border-wiki-border"></div>
-      </div>
-      
-      <div class="flex justify-center space-x-6 mt-6">
-        <a href="#" class="w-10 h-10 rounded-full bg-[#FE7A9A]/10 flex items-center justify-center text-[#FE7A9A] hover:bg-[#FE7A9A]/20 transition-colors">
-          <i class="fa-brands fa-bilibili"></i>
-        </a>
-        <a href="#" class="w-10 h-10 rounded-full bg-[#1677FF]/10 flex items-center justify-center text-[#1677FF] hover:bg-[#1677FF]/20 transition-colors">
-          <i class="fa-brands fa-weixin"></i>
-        </a>
-        <a href="#" class="w-10 h-10 rounded-full bg-[#1DA1F2]/10 flex items-center justify-center text-[#1DA1F2] hover:bg-[#1DA1F2]/20 transition-colors">
-          <i class="fa-brands fa-twitter"></i>
-        </a>
-      </div>
-    </div>
-    
-    <!-- 注册链接 -->
-    <div class="mt-8 text-center">
-      <p class="text-sm text-wiki-lighttext">
-        还没有账号? <a href="#" class="text-primary font-medium hover:underline">立即注册</a>
-      </p>
-    </div>
-  </div>
+        <!-- Upload Area -->
+        <section class="max-w-4xl mx-auto mb-12">
+            <div id="uploadArea" class="border-2 border-dashed border-gray-300 rounded-2xl p-8 text-center hover:border-primary transition-colors cursor-pointer bg-white/70 backdrop-blur-sm card-hover">
+                <div class="space-y-4">
+                    <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                        <i class="fa fa-cloud-upload text-primary text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800">拖拽图片到这里</h3>
+                    <p class="text-gray-600">或者</p>
+                    <button id="selectFilesBtn" class="bg-primary hover:bg-secondary text-white px-8 py-3 rounded-xl font-medium transition-all transform hover:scale-105 shadow-lg">
+                        <i class="fa fa-image mr-2"></i>选择图片
+                    </button>
+                    <input type="file" id="fileInput" accept="image/*" multiple class="hidden">
+                    <p class="text-sm text-gray-500">支持JPG、PNG、WebP格式，单张最大20MB</p>
+                </div>
+            </div>
+        </section>
 
-  <script>
-    // 显示/隐藏密码
-    const togglePassword = document.getElementById('toggle-password');
-    const passwordInput = document.getElementById('password');
-    
-    togglePassword.addEventListener('click', () => {
-      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-      passwordInput.setAttribute('type', type);
-      
-      // 切换图标
-      const icon = togglePassword.querySelector('i');
-      if (type === 'password') {
-        icon.classList.remove('fa-eye');
-        icon.classList.add('fa-eye-slash');
-      } else {
-        icon.classList.remove('fa-eye-slash');
-        icon.classList.add('fa-eye');
-      }
-    });
-    
-    // 登录表单处理
-    const loginForm = document.getElementById('login-form');
-    const toast = document.getElementById('toast');
-    
-    loginForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-      const rememberMe = document.getElementById('remember-me').checked;
-      
-      // 验证账号密码 (admin / 123)
-      if (username === 'admin' && password === '123') {
-        // 保存用户信息到本地存储
-        const userInfo = {
-          username: username,
-          avatar: 'https://picsum.photos/40/40?random=200', // 头像URL
-          loginTime: new Date().getTime()
-        };
-        
-        localStorage.setItem('userInfo', JSON.stringify(userInfo));
-        
-        // 如果没有勾选记住我，设置会话过期时间
-        if (!rememberMe) {
-          // 设置24小时后自动清除登录状态
-          const expiryTime = 24 * 60 * 60 * 1000; // 24小时
-          setTimeout(() => {
-            localStorage.removeItem('userInfo');
-          }, expiryTime);
+        <!-- Processing Area (Hidden by default) -->
+        <section id="processingArea" class="max-w-6xl mx-auto hidden">
+            <!-- Progress Bar -->
+            <div class="mb-8 bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800">处理进度</h3>
+                    <span id="progressText" class="text-sm text-gray-600">0%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-3 mb-2">
+                    <div id="progressBar" class="bg-gradient-to-r from-primary to-secondary h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+                <div id="currentFileInfo" class="text-sm text-gray-600"></div>
+            </div>
+
+            <!-- Settings Panel -->
+            <div class="grid lg:grid-cols-3 gap-8 mb-8">
+                <!-- Quality Settings -->
+                <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg card-hover">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fa fa-sliders text-primary mr-2"></i>压缩质量
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="space-y-2">
+                            <label class="flex justify-between text-sm">
+                                <span>质量级别</span>
+                                <span id="qualityValue" class="font-semibold text-primary">80%</span>
+                            </label>
+                            <input type="range" id="qualitySlider" min="10" max="100" value="80" 
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary">
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button class="quality-preset px-3 py-2 text-sm rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors" data-quality="90">高</button>
+                            <button class="quality-preset px-3 py-2 text-sm rounded-lg bg-primary text-white" data-quality="80">中</button>
+                            <button class="quality-preset px-3 py-2 text-sm rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors" data-quality="70">低</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Size Settings -->
+                <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg card-hover">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fa fa-expand text-primary mr-2"></i>尺寸设置
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">最大宽度 (px)</label>
+                            <input type="number" id="maxWidth" placeholder="保持原始" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">输出格式</label>
+                            <select id="outputFormat" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option value="image/jpeg">JPEG (推荐照片)</option>
+                                <option value="image/png">PNG (支持透明)</option>
+                                <option value="image/webp">WebP (最佳压缩)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg card-hover flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                            <i class="fa fa-cogs text-primary mr-2"></i>操作
+                        </h3>
+                        <div class="space-y-3">
+                            <button id="startCompressionBtn" class="w-full bg-success hover:bg-green-600 text-white py-3 rounded-xl font-medium transition-all transform hover:scale-105 shadow-lg">
+                                <i class="fa fa-play mr-2"></i>开始压缩
+                            </button>
+                            <button id="resetBtn" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 rounded-xl font-medium transition-all">
+                                <i class="fa fa-bullseye mr-2"></i>重置
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preview Section -->
+            <div id="previewSection" class="grid lg:grid-cols-2 gap-8 mb-8 hidden">
+                <!-- Original Image -->
+                <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg card-hover">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fa fa-image text-gray-500 mr-2"></i>原始图片
+                    </h3>
+                    <div class="aspect-w-16 aspect-h-9 mb-4">
+                        <img id="originalImage" class="w-full h-64 object-contain rounded-lg bg-gray-100" alt="原始图片">
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <p><span class="font-medium">文件大小:</span> <span id="originalSize">-</span></p>
+                        <p><span class="font-medium">尺寸:</span> <span id="originalDimensions">-</span></p>
+                        <p><span class="font-medium">格式:</span> <span id="originalFormat">-</span></p>
+                    </div>
+                </div>
+
+                <!-- Compressed Image -->
+                <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg card-hover">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fa fa-compress text-success mr-2"></i>压缩后图片
+                    </h3>
+                    <div class="aspect-w-16 aspect-h-9 mb-4">
+                        <img id="compressedImage" class="w-full h-64 object-contain rounded-lg bg-gray-100" alt="压缩后图片">
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <p><span class="font-medium">文件大小:</span> <span id="compressedSize">-</span></p>
+                        <p><span class="font-medium">尺寸:</span> <span id="compressedDimensions">-</span></p>
+                        <p><span class="font-medium">压缩率:</span> <span id="compressionRatio" class="text-success font-semibold">-</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div id="resultsSection" class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg hidden">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-semibold text-gray-800">压缩结果</h3>
+                    <div class="flex space-x-3">
+                        <button id="downloadAllBtn" class="bg-success hover:bg-green-600 text-white px-6 py-2 rounded-lg font-medium transition-all">
+                            <i class="fa fa-download mr-2"></i>下载全部
+                        </button>
+                        <button id="downloadZipBtn" class="bg-primary hover:bg-secondary text-white px-6 py-2 rounded-lg font-medium transition-all">
+                            <i class="fa fa-file-zip-o mr-2"></i>打包下载
+                        </button>
+                    </div>
+                </div>
+                <div id="resultsList" class="space-y-4 max-h-96 overflow-y-auto">
+                    <!-- Results will be dynamically added here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="max-w-6xl mx-auto mb-12">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 text-center shadow-lg card-hover">
+                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa fa-bolt text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">极速压缩</h3>
+                    <p class="text-gray-600">本地处理，无需上传，秒级完成压缩</p>
+                </div>
+                <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 text-center shadow-lg card-hover">
+                    <div class="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa fa-shield text-success text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">隐私保护</h3>
+                    <p class="text-gray-600">所有图片处理在本地完成，不上传到服务器</p>
+                </div>
+                <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 text-center shadow-lg card-hover">
+                    <div class="w-16 h-16 bg-warning/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa fa-bullseye text-warning text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">智能优化</h3>
+                    <p class="text-gray-600">AI算法自动平衡压缩率和图片质量</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white/80 backdrop-blur-md border-t border-gray-200/50 py-8">
+        <div class="container mx-auto px-4 text-center">
+            <div class="flex items-center justify-center space-x-4 mb-4">
+                <div class="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
+                    <i class="fa fa-compress text-white text-sm"></i>
+                </div>
+                <span class="text-lg font-semibold text-gray-800">智能照片压缩</span>
+            </div>
+            <p class="text-gray-600 mb-4">免费、安全、高效的在线图片压缩工具</p>
+            <div class="flex items-center justify-center space-x-6 text-sm text-gray-500">
+                <span>© 2025 智能照片压缩工具</span>
+                <span>•</span>
+                <span>本地安全处理</span>
+                <span>•</span>
+                <span>支持多种格式</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Help Modal -->
+    <div id="helpModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto shadow-2xl animate-slide-up">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xl font-semibold text-gray-800">使用帮助</h3>
+                    <button id="closeHelpBtn" class="text-gray-400 hover:text-gray-600">
+                        <i class="fa fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6 space-y-6">
+                <div>
+                    <h4 class="font-semibold text-gray-800 mb-2">如何使用</h4>
+                    <ol class="list-decimal list-inside space-y-2 text-gray-600">
+                        <li>点击"选择图片"按钮或拖拽图片到上传区域</li>
+                        <li>调整压缩质量和尺寸设置</li>
+                        <li>点击"开始压缩"按钮</li>
+                        <li>压缩完成后点击下载按钮保存图片</li>
+                    </ol>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-gray-800 mb-2">支持的格式</h4>
+                    <p class="text-gray-600">JPG、PNG、WebP格式的图片文件</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-gray-800 mb-2">隐私说明</h4>
+                    <p class="text-gray-600">所有图片处理都在您的浏览器本地完成，不会上传到任何服务器，确保您的隐私安全。</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-gray-800 mb-2">压缩质量建议</h4>
+                    <ul class="list-disc list-inside space-y-1 text-gray-600">
+                        <li><strong>高 (85-95%):</strong> 保持高质量，文件较大</li>
+                        <li><strong>中 (70-85%):</strong> 平衡质量和大小，推荐使用</li>
+                        <li><strong>低 (50-70%):</strong> 最大压缩，文件最小</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class ImageCompressor {
+            constructor() {
+                this.initializeElements();
+                this.initializeEventListeners();
+                this.selectedFiles = [];
+                this.compressedFiles = [];
+                this.isCompressing = false;
+            }
+
+            initializeElements() {
+                // Upload elements
+                this.uploadArea = document.getElementById('uploadArea');
+                this.fileInput = document.getElementById('fileInput');
+                this.selectFilesBtn = document.getElementById('selectFilesBtn');
+                
+                // Processing elements
+                this.processingArea = document.getElementById('processingArea');
+                this.progressBar = document.getElementById('progressBar');
+                this.progressText = document.getElementById('progressText');
+                this.currentFileInfo = document.getElementById('currentFileInfo');
+                
+                // Settings elements
+                this.qualitySlider = document.getElementById('qualitySlider');
+                this.qualityValue = document.getElementById('qualityValue');
+                this.maxWidth = document.getElementById('maxWidth');
+                this.outputFormat = document.getElementById('outputFormat');
+                this.qualityPresets = document.querySelectorAll('.quality-preset');
+                
+                // Action buttons
+                this.startCompressionBtn = document.getElementById('startCompressionBtn');
+                this.resetBtn = document.getElementById('resetBtn');
+                
+                // Preview elements
+                this.previewSection = document.getElementById('previewSection');
+                this.originalImage = document.getElementById('originalImage');
+                this.compressedImage = document.getElementById('compressedImage');
+                this.originalSize = document.getElementById('originalSize');
+                this.originalDimensions = document.getElementById('originalDimensions');
+                this.originalFormat = document.getElementById('originalFormat');
+                this.compressedSize = document.getElementById('compressedSize');
+                this.compressedDimensions = document.getElementById('compressedDimensions');
+                this.compressionRatio = document.getElementById('compressionRatio');
+                
+                // Results elements
+                this.resultsSection = document.getElementById('resultsSection');
+                this.resultsList = document.getElementById('resultsList');
+                this.downloadAllBtn = document.getElementById('downloadAllBtn');
+                this.downloadZipBtn = document.getElementById('downloadZipBtn');
+                
+                // Modal elements
+                this.helpBtn = document.getElementById('helpBtn');
+                this.helpModal = document.getElementById('helpModal');
+                this.closeHelpBtn = document.getElementById('closeHelpBtn');
+                
+                // Theme toggle
+                this.themeToggle = document.getElementById('themeToggle');
+            }
+
+            initializeEventListeners() {
+                // Upload events
+                this.uploadArea.addEventListener('click', () => this.fileInput.click());
+                this.selectFilesBtn.addEventListener('click', () => this.fileInput.click());
+                this.fileInput.addEventListener('change', (e) => this.handleFileSelect(e));
+                
+                // Drag and drop events
+                this.uploadArea.addEventListener('dragover', (e) => this.handleDragOver(e));
+                this.uploadArea.addEventListener('drop', (e) => this.handleDrop(e));
+                this.uploadArea.addEventListener('dragleave', () => this.handleDragLeave());
+                
+                // Settings events
+                this.qualitySlider.addEventListener('input', (e) => this.updateQualityValue(e));
+                this.qualityPresets.forEach(preset => {
+                    preset.addEventListener('click', (e) => this.selectQualityPreset(e));
+                });
+                
+                // Action events
+                this.startCompressionBtn.addEventListener('click', () => this.startCompression());
+                this.resetBtn.addEventListener('click', () => this.resetForm());
+                
+                // Results events
+                this.downloadAllBtn.addEventListener('click', () => this.downloadAllFiles());
+                this.downloadZipBtn.addEventListener('click', () => this.downloadZip());
+                
+                // Modal events
+                this.helpBtn.addEventListener('click', () => this.showHelpModal());
+                this.closeHelpBtn.addEventListener('click', () => this.hideHelpModal());
+                this.helpModal.addEventListener('click', (e) => this.handleModalClick(e));
+                
+                // Theme toggle
+                this.themeToggle.addEventListener('click', () => this.toggleTheme());
+            }
+
+            handleFileSelect(event) {
+                const files = event.target.files;
+                if (files.length > 0) {
+                    this.processFiles(files);
+                }
+            }
+
+            handleDragOver(event) {
+                event.preventDefault();
+                this.uploadArea.classList.add('border-primary', 'bg-primary/5');
+            }
+
+            handleDragLeave() {
+                this.uploadArea.classList.remove('border-primary', 'bg-primary/5');
+            }
+
+            handleDrop(event) {
+                event.preventDefault();
+                this.uploadArea.classList.remove('border-primary', 'bg-primary/5');
+                
+                const files = event.dataTransfer.files;
+                if (files.length > 0) {
+                    this.processFiles(files);
+                }
+            }
+
+            processFiles(files) {
+                this.selectedFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
+                
+                if (this.selectedFiles.length === 0) {
+                    this.showNotification('请选择图片文件', 'warning');
+                    return;
+                }
+                
+                // Check file size
+                const oversizedFiles = this.selectedFiles.filter(file => file.size > 20 * 1024 * 1024);
+                if (oversizedFiles.length > 0) {
+                    this.showNotification(`部分文件超过20MB限制，请重新选择`, 'danger');
+                    this.selectedFiles = this.selectedFiles.filter(file => file.size <= 20 * 1024 * 1024);
+                }
+                
+                if (this.selectedFiles.length === 0) {
+                    return;
+                }
+                
+                this.showProcessingArea();
+                this.previewFirstImage();
+            }
+
+            showProcessingArea() {
+                this.processingArea.classList.remove('hidden');
+                this.uploadArea.classList.add('opacity-50', 'pointer-events-none');
+                
+                // Scroll to processing area
+                this.processingArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            previewFirstImage() {
+                const firstFile = this.selectedFiles[0];
+                const reader = new FileReader();
+                
+                reader.onload = (e) => {
+                    this.originalImage.src = e.target.result;
+                    this.originalImage.onload = () => {
+                        this.updateOriginalInfo(firstFile);
+                        this.previewSection.classList.remove('hidden');
+                    };
+                };
+                
+                reader.readAsDataURL(firstFile);
+            }
+
+            updateOriginalInfo(file) {
+                this.originalSize.textContent = this.formatFileSize(file.size);
+                this.originalDimensions.textContent = `${this.originalImage.width} × ${this.originalImage.height}`;
+                this.originalFormat.textContent = file.type.split('/')[1].toUpperCase();
+            }
+
+            updateQualityValue(event) {
+                const value = event.target.value;
+                this.qualityValue.textContent = `${value}%`;
+                
+                // Update preset buttons
+                this.qualityPresets.forEach(preset => {
+                    preset.classList.remove('bg-primary', 'text-white');
+                    preset.classList.add('bg-gray-100');
+                });
+            }
+
+            selectQualityPreset(event) {
+                const quality = event.target.dataset.quality;
+                this.qualitySlider.value = quality;
+                this.qualityValue.textContent = `${quality}%`;
+                
+                // Update preset buttons
+                this.qualityPresets.forEach(preset => {
+                    preset.classList.remove('bg-primary', 'text-white');
+                    preset.classList.add('bg-gray-100');
+                });
+                
+                event.target.classList.remove('bg-gray-100');
+                event.target.classList.add('bg-primary', 'text-white');
+            }
+
+            async startCompression() {
+                if (this.isCompressing) return;
+                
+                this.isCompressing = true;
+                this.startCompressionBtn.disabled = true;
+                this.startCompressionBtn.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i>压缩中...';
+                
+                try {
+                    this.compressedFiles = [];
+                    this.updateProgress(0, 0);
+                    
+                    for (let i = 0; i < this.selectedFiles.length; i++) {
+                        const file = this.selectedFiles[i];
+                        this.currentFileInfo.textContent = `正在处理: ${file.name}`;
+                        
+                        const compressedFile = await this.compressImage(file);
+                        this.compressedFiles.push(compressedFile);
+                        
+                        const progress = ((i + 1) / this.selectedFiles.length) * 100;
+                        this.updateProgress(progress, i + 1);
+                        
+                        // Update preview for first file
+                        if (i === 0) {
+                            this.updateCompressedPreview(compressedFile);
+                        }
+                        
+                        // Small delay to show progress
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    }
+                    
+                    this.showResults();
+                    this.showNotification('压缩完成！', 'success');
+                } catch (error) {
+                    console.error('压缩失败:', error);
+                    this.showNotification('压缩失败，请重试', 'danger');
+                } finally {
+                    this.isCompressing = false;
+                    this.startCompressionBtn.disabled = false;
+                    this.startCompressionBtn.innerHTML = '<i class="fa fa-play mr-2"></i>开始压缩';
+                }
+            }
+
+            async compressImage(file) {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        
+                        // Calculate new dimensions
+                        const { width, height } = this.calculateSize(img.width, img.height);
+                        canvas.width = width;
+                        canvas.height = height;
+                        
+                        // Draw image with anti-aliasing
+                        ctx.imageSmoothingEnabled = true;
+                        ctx.imageSmoothingQuality = 'high';
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // Convert canvas to blob
+                        canvas.toBlob((blob) => {
+                            const compressedFile = new File([blob], this.getOutputFilename(file), {
+                                type: this.outputFormat.value
+                            });
+                            resolve(compressedFile);
+                        }, this.outputFormat.value, this.qualitySlider.value / 100);
+                        
+                        // Clean up
+                        URL.revokeObjectURL(img.src);
+                    };
+                    
+                    img.src = URL.createObjectURL(file);
+                });
+            }
+
+            calculateSize(width, height) {
+                const maxWidth = parseInt(this.maxWidth.value) || Infinity;
+                
+                if (width <= maxWidth) {
+                    return { width, height };
+                }
+                
+                const ratio = maxWidth / width;
+                return {
+                    width: maxWidth,
+                    height: Math.round(height * ratio)
+                };
+            }
+
+            getOutputFilename(file) {
+                const extension = this.outputFormat.value.split('/')[1];
+                const name = file.name.replace(/\.[^/.]+$/, "");
+                return `${name}_compressed.${extension}`;
+            }
+
+            updateCompressedPreview(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.compressedImage.src = e.target.result;
+                    this.compressedImage.onload = () => {
+                        this.updateCompressedInfo(file);
+                    };
+                };
+                reader.readAsDataURL(file);
+            }
+
+            updateCompressedInfo(file) {
+                const originalFile = this.selectedFiles[0];
+                const compressionRatio = Math.round((1 - file.size / originalFile.size) * 100);
+                
+                this.compressedSize.textContent = this.formatFileSize(file.size);
+                this.compressedDimensions.textContent = `${this.compressedImage.width} × ${this.compressedImage.height}`;
+                this.compressionRatio.textContent = `节省 ${compressionRatio}%`;
+            }
+
+            showResults() {
+                this.resultsList.innerHTML = '';
+                
+                this.compressedFiles.forEach((file, index) => {
+                    const originalFile = this.selectedFiles[index];
+                    const compressionRatio = Math.round((1 - file.size / originalFile.size) * 100);
+                    
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors';
+                    resultItem.innerHTML = `
+                        <div class="flex-1">
+                            <div class="font-medium text-gray-800 mb-1">${file.name}</div>
+                            <div class="flex items-center space-x-4 text-sm text-gray-600">
+                                <span>原始: ${this.formatFileSize(originalFile.size)}</span>
+                                <span>→</span>
+                                <span>压缩: ${this.formatFileSize(file.size)}</span>
+                                <span class="text-success font-semibold">节省 ${compressionRatio}%</span>
+                            </div>
+                        </div>
+                        <button onclick="compressor.downloadFile(${index})" 
+                                class="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-lg transition-colors">
+                            <i class="fa fa-download mr-2"></i>下载
+                        </button>
+                    `;
+                    this.resultsList.appendChild(resultItem);
+                });
+                
+                this.resultsSection.classList.remove('hidden');
+                this.resultsSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            downloadFile(index) {
+                const file = this.compressedFiles[index];
+                const url = URL.createObjectURL(file);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = file.name;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                this.showNotification(`已下载: ${file.name}`, 'success');
+            }
+
+            async downloadAllFiles() {
+                for (let i = 0; i < this.compressedFiles.length; i++) {
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                    this.downloadFile(i);
+                }
+            }
+
+            async downloadZip() {
+                try {
+                    // Check if JSZip is loaded
+                    if (typeof JSZip === 'undefined') {
+                        // Load JSZip dynamically
+                        await new Promise((resolve, reject) => {
+                            const script = document.createElement('script');
+                            script.src = 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';
+                            script.onload = resolve;
+                            script.onerror = reject;
+                            document.head.appendChild(script);
+                        });
+                    }
+
+                    const zip = new JSZip();
+                    const folder = zip.folder('compressed_images');
+
+                    for (const file of this.compressedFiles) {
+                        const arrayBuffer = await new Promise((resolve) => {
+                            const reader = new FileReader();
+                            reader.onload = (e) => resolve(e.target.result);
+                            reader.readAsArrayBuffer(file);
+                        });
+                        folder.file(file.name, arrayBuffer);
+                    }
+
+                    const content = await zip.generateAsync({ 
+                        type: 'blob',
+                        compression: 'DEFLATE',
+                        compressionOptions: { level: 6 }
+                    });
+
+                    const url = URL.createObjectURL(content);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'compressed_images.zip';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+
+                    this.showNotification('ZIP文件已生成并下载', 'success');
+                } catch (error) {
+                    console.error('生成ZIP失败:', error);
+                    this.showNotification('生成ZIP失败，请重试', 'danger');
+                }
+            }
+
+            resetForm() {
+                this.selectedFiles = [];
+                this.compressedFiles = [];
+                this.isCompressing = false;
+                
+                // Reset UI
+                this.processingArea.classList.add('hidden');
+                this.previewSection.classList.add('hidden');
+                this.resultsSection.classList.add('hidden');
+                this.uploadArea.classList.remove('opacity-50', 'pointer-events-none');
+                
+                // Reset form values
+                this.fileInput.value = '';
+                this.qualitySlider.value = 80;
+                this.qualityValue.textContent = '80%';
+                this.maxWidth.value = '';
+                this.outputFormat.value = 'image/jpeg';
+                
+                // Reset progress
+                this.progressBar.style.width = '0%';
+                this.progressText.textContent = '0%';
+                this.currentFileInfo.textContent = '';
+                
+                // Reset preset buttons
+                this.qualityPresets.forEach(preset => {
+                    preset.classList.remove('bg-primary', 'text-white');
+                    preset.classList.add('bg-gray-100');
+                });
+                document.querySelector('[data-quality="80"]').classList.remove('bg-gray-100');
+                document.querySelector('[data-quality="80"]').classList.add('bg-primary', 'text-white');
+            }
+
+            formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            updateProgress(percentage, current, total = this.selectedFiles.length) {
+                this.progressBar.style.width = `${percentage}%`;
+                this.progressText.textContent = `${Math.round(percentage)}%`;
+                this.currentFileInfo.textContent = `正在处理 ${current}/${total} 个文件`;
+            }
+
+            showNotification(message, type = 'info') {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300`;
+                
+                // Set color based on type
+                switch(type) {
+                    case 'success':
+                        notification.classList.add('bg-success', 'text-white');
+                        break;
+                    case 'warning':
+                        notification.classList.add('bg-warning', 'text-white');
+                        break;
+                    case 'danger':
+                        notification.classList.add('bg-danger', 'text-white');
+                        break;
+                    default:
+                        notification.classList.add('bg-primary', 'text-white');
+                }
+                
+                notification.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <i class="fa fa-check-circle"></i>
+                        <span>${message}</span>
+                    </div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Show notification
+                setTimeout(() => {
+                    notification.classList.remove('translate-x-full');
+                }, 100);
+                
+                // Hide notification
+                setTimeout(() => {
+                    notification.classList.add('translate-x-full');
+                    setTimeout(() => {
+                        document.body.removeChild(notification);
+                    }, 300);
+                }, 3000);
+            }
+
+            showHelpModal() {
+                this.helpModal.classList.remove('hidden');
+                this.helpModal.classList.add('flex');
+                document.body.style.overflow = 'hidden';
+            }
+
+            hideHelpModal() {
+                this.helpModal.classList.add('hidden');
+                this.helpModal.classList.remove('flex');
+                document.body.style.overflow = 'auto';
+            }
+
+            handleModalClick(event) {
+                if (event.target === this.helpModal) {
+                    this.hideHelpModal();
+                }
+            }
+
+            toggleTheme() {
+                const body = document.body;
+                const icon = this.themeToggle.querySelector('i');
+                
+                if (body.classList.contains('dark')) {
+                    body.classList.remove('dark');
+                    icon.className = 'fa fa-moon text-gray-600';
+                } else {
+                    body.classList.add('dark');
+                    icon.className = 'fa fa-sun-o text-yellow-400';
+                }
+            }
         }
-        
-        // 显示成功提示
-        toast.textContent = '登录成功，正在返回首页...';
-        toast.classList.add('show');
-        
-        // 1.5秒后跳回首页
-        setTimeout(() => {
-          window.location.href = 'index.html';
-        }, 1500);
-      } else {
-        // 显示错误提示
-        toast.textContent = '账号或密码错误，请重试';
-        toast.classList.add('show');
-        
-        // 3秒后隐藏提示
-        setTimeout(() => {
-          toast.classList.remove('show');
-        }, 3000);
-      }
-    });
-  </script>
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            window.compressor = new ImageCompressor();
+        });
+    </script>
 </body>
 </html>
-    
