@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>图片背景色去除工具</title>
+  <!-- 引入Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 引入Font Awesome -->
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  
+  <!-- 配置Tailwind -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3B82F6',
+            secondary: '#10B981',
+            dark: '#1E293B',
+            light: '#F8FAFC'
+          },
+          fontFamily: {
+            inter: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .shadow-soft {
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+      }
+      .transition-custom {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .file-input-hidden {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+        z-index: 10;
+      }
+    }
+  </style>
+</head>
+<body class="font-inter bg-gradient-to-br from-light to-slate-100 min-h-screen text-dark">
+  <!-- 页面容器 -->
+  <div class="container mx-auto px-4 py-8 max-w-6xl">
+    <!-- 标题区域 -->
+    <header class="text-center mb-12">
+      <h1 class="text-[clamp(2rem,5vw,3rem)] font-bold text-dark mb-3 bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
+        图片背景色去除工具
+      </h1>
+      <p class="text-slate-600 max-w-2xl mx-auto">
+        上传图片，选择需要去除的背景色，轻松将图片中的指定颜色变为透明
+      </p>
+    </header>
+    
+    <!-- 主要内容区域 -->
+    <main class="bg-white rounded-2xl shadow-soft p-6 md:p-8 mb-10">
+      <!-- 上传区域 -->
+      <div class="mb-10">
+        <label for="imageUpload" class="block text-lg font-medium text-slate-700 mb-3">上传图片</label>
+        <!-- 修复上传区域：使用相对定位确保文件输入框能响应点击 -->
+        <div class="relative border-2 border-dashed border-slate-300 rounded-xl p-8 text-center hover:border-primary transition-custom cursor-pointer" id="dropArea">
+          <!-- 优化文件输入框的隐藏方式，确保能被触发 -->
+          <input type="file" id="imageUpload" accept="image/*" class="file-input-hidden">
+          <i class="fa fa-cloud-upload text-5xl text-primary mb-4"></i>
+          <p class="text-slate-500 mb-2">点击或拖拽图片到此处上传</p>
+          <p class="text-sm text-slate-400">支持 PNG, JPG, JPEG, GIF, BMP 格式</p>
+        </div>
+      </div>
+      
+      <!-- 颜色选择区域 -->
+      <div class="mb-10">
+        <label class="block text-lg font-medium text-slate-700 mb-3">选择要去除的颜色</label>
+        <div class="flex flex-col md:flex-row gap-4 items-start md:items-center">
+          <div class="w-20 h-20 rounded-lg shadow-md border border-slate-200" id="colorPreview"></div>
+          <input type="color" id="colorPicker" class="w-32 h-10 cursor-pointer rounded-lg overflow-hidden border border-slate-300">
+          <button id="pickFromImage" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-custom flex items-center gap-2">
+            <i class="fa fa-eyedropper"></i>
+            <span>从图片取色</span>
+          </button>
+        </div>
+        
+        <!-- 颜色容差调节 -->
+        <div class="mt-6">
+          <label for="colorTolerance" class="block text-lg font-medium text-slate-700 mb-2">
+            颜色容差 <span id="toleranceValue" class="text-primary font-semibold">30</span>
+          </label>
+          <p class="text-sm text-slate-500 mb-3">
+            调整颜色匹配的精确度，数值越大，匹配的颜色范围越广
+          </p>
+          <input 
+            type="range" 
+            id="colorTolerance" 
+            min="0" 
+            max="100" 
+            value="30" 
+            class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary"
+          >
+        </div>
+      </div>
+      
+      <!-- 操作按钮 -->
+      <div class="mb-10 text-center">
+        <button id="processBtn" class="px-8 py-3 bg-secondary text-white rounded-lg hover:bg-secondary/90 transition-custom font-medium disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+          <i class="fa fa-magic mr-2"></i>处理图片
+        </button>
+      </div>
+      
+      <!-- 图片预览区域 -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- 原始图片 -->
+        <div class="preview-container">
+          <h3 class="text-lg font-medium text-slate-700 mb-3">原始图片</h3>
+          <div class="bg-slate-50 rounded-xl p-4 min-h-[200px] flex items-center justify-center border border-slate-200" id="originalPreview">
+            <p class="text-slate-400 text-center">
+              <i class="fa fa-image text-4xl block mb-2"></i>
+              原始图片将显示在这里
+            </p>
+          </div>
+        </div>
+        
+        <!-- 处理后图片 -->
+        <div class="preview-container">
+          <h3 class="text-lg font-medium text-slate-700 mb-3">处理后图片</h3>
+          <div class="bg-slate-50 rounded-xl p-4 min-h-[200px] flex items-center justify-center border border-slate-200" id="processedPreview">
+            <p class="text-slate-400 text-center">
+              <i class="fa fa-picture-o text-4xl block mb-2"></i>
+              处理后的图片将显示在这里
+            </p>
+          </div>
+          <div class="mt-4 text-center" id="downloadContainer" style="display: none;">
+            <a id="downloadLink" href="#" class="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-custom">
+              <i class="fa fa-download"></i>
+              <span>下载处理后的图片</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </main>
+    
+    <!-- 页脚 -->
+    <footer class="text-center text-slate-500 text-sm">
+      <p>图片背景色去除工具 &copy; 2023</p>
+    </footer>
+  </div>
+  
+  <!-- 进度提示 -->
+  <div id="progressModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-xl p-8 max-w-md w-full text-center">
+      <div class="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+      <h3 class="text-xl font-medium mb-2">处理中...</h3>
+      <p class="text-slate-500">正在处理您的图片，请稍候</p>
+    </div>
+  </div>
+
+  <script>
+    // 获取DOM元素
+    const dropArea = document.getElementById('dropArea');
+    const imageUpload = document.getElementById('imageUpload');
+    const colorPicker = document.getElementById('colorPicker');
+    const colorPreview = document.getElementById('colorPreview');
+    const pickFromImage = document.getElementById('pickFromImage');
+    const processBtn = document.getElementById('processBtn');
+    const originalPreview = document.getElementById('originalPreview');
+    const processedPreview = document.getElementById('processedPreview');
+    const downloadLink = document.getElementById('downloadLink');
+    const downloadContainer = document.getElementById('downloadContainer');
+    const progressModal = document.getElementById('progressModal');
+    const colorTolerance = document.getElementById('colorTolerance');
+    const toleranceValue = document.getElementById('toleranceValue');
+    
+    // 全局变量
+    let originalImage = null;
+    
+    // 初始化颜色预览
+    colorPreview.style.backgroundColor = colorPicker.value;
+    toleranceValue.textContent = colorTolerance.value;
+    
+    // 颜色选择器变化时更新预览
+    colorPicker.addEventListener('input', () => {
+      colorPreview.style.backgroundColor = colorPicker.value;
+    });
+    
+    // 容差滑块变化时更新显示
+    colorTolerance.addEventListener('input', () => {
+      toleranceValue.textContent = colorTolerance.value;
+    });
+    
+    // 修复点击上传逻辑：确保文件选择框能被触发
+    dropArea.addEventListener('click', (e) => {
+      // 防止事件冒泡导致的问题
+      e.stopPropagation();
+      // 直接触发文件选择框
+      imageUpload.click();
+    });
+    
+    // 防止拖拽事件影响点击
+    dropArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropArea.classList.add('border-primary');
+    });
+    
+    dropArea.addEventListener('dragleave', () => {
+      dropArea.classList.remove('border-primary');
+    });
+    
+    dropArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropArea.classList.remove('border-primary');
+      
+      if (e.dataTransfer.files.length) {
+        handleImageUpload(e.dataTransfer.files[0]);
+      }
+    });
+    
+    // 处理文件上传（选择文件后）
+    imageUpload.addEventListener('change', () => {
+      if (imageUpload.files.length) {
+        handleImageUpload(imageUpload.files[0]);
+      }
+    });
+    
+    // 处理图片上传
+    function handleImageUpload(file) {
+      // 检查文件类型
+      if (!file.type.startsWith('image/')) {
+        alert('请上传图片文件（支持PNG、JPG、GIF等格式）');
+        return;
+      }
+      
+      // 读取图片
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          originalImage = img;
+          // 显示原始图片
+          originalPreview.innerHTML = '';
+          const imgElement = document.createElement('img');
+          imgElement.src = e.target.result;
+          imgElement.classList.add('max-w-full', 'max-h-[300px]', 'object-contain');
+          originalPreview.appendChild(imgElement);
+          
+          // 启用处理按钮
+          processBtn.disabled = false;
+          
+          // 重置处理后图片区域
+          processedPreview.innerHTML = '<p class="text-slate-400 text-center"><i class="fa fa-picture-o text-4xl block mb-2"></i>处理后的图片将显示在这里</p>';
+          downloadContainer.style.display = 'none';
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+    
+    // 从图片取色功能
+    pickFromImage.addEventListener('click', () => {
+      if (!originalImage) {
+        alert('请先上传图片');
+        return;
+      }
+      
+      // 创建一个临时canvas用于取色
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      // 设置canvas尺寸与图片一致
+      canvas.width = originalImage.width;
+      canvas.height = originalImage.height;
+      ctx.drawImage(originalImage, 0, 0);
+      
+      // 将canvas添加到原始预览区域
+      const tempCanvasContainer = document.createElement('div');
+      tempCanvasContainer.classList.add('absolute', 'inset-0', 'flex', 'items-center', 'justify-center', 'bg-black/50', 'rounded-xl', 'p-4');
+      
+      const tempCanvasWrapper = document.createElement('div');
+      tempCanvasWrapper.classList.add('relative');
+      
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = Math.min(originalImage.width, 600);
+      tempCanvas.height = Math.min(originalImage.height, 400);
+      const tempCtx = tempCanvas.getContext('2d');
+      tempCtx.drawImage(originalImage, 0, 0, tempCanvas.width, tempCanvas.height);
+      
+      const scaleX = originalImage.width / tempCanvas.width;
+      const scaleY = originalImage.height / tempCanvas.height;
+      
+      const instruction = document.createElement('div');
+      instruction.classList.add('absolute', 'top-2', 'left-2', 'bg-white/80', 'px-3', 'py-1', 'rounded-full', 'text-sm');
+      instruction.textContent = '点击选择要去除的颜色';
+      
+      tempCanvasWrapper.appendChild(tempCanvas);
+      tempCanvasWrapper.appendChild(instruction);
+      tempCanvasContainer.appendChild(tempCanvasWrapper);
+      
+      // 添加关闭按钮
+      const closeBtn = document.createElement('button');
+      closeBtn.classList.add('absolute', 'top-4', 'right-4', 'bg-white', 'w-8', 'h-8', 'rounded-full', 'flex', 'items-center', 'justify-center', 'shadow-md');
+      closeBtn.innerHTML = '<i class="fa fa-times"></i>';
+      closeBtn.addEventListener('click', () => {
+        originalPreview.removeChild(tempCanvasContainer);
+      });
+      
+      tempCanvasContainer.appendChild(closeBtn);
+      originalPreview.appendChild(tempCanvasContainer);
+      
+      // 取色放大预览
+      const zoomPreview = document.createElement('div');
+      zoomPreview.classList.add('absolute', 'w-32', 'h-32', 'border-2', 'border-white', 'rounded-lg', 'overflow-hidden', 'hidden', 'shadow-lg');
+      tempCanvasWrapper.appendChild(zoomPreview);
+      
+      tempCanvas.addEventListener('mousemove', (e) => {
+        const rect = tempCanvas.getBoundingClientRect();
+        const x = Math.floor((e.clientX - rect.left) * scaleX);
+        const y = Math.floor((e.clientY - rect.top) * scaleY);
+        
+        zoomPreview.style.left = `${e.offsetX + 10}px`;
+        zoomPreview.style.top = `${e.offsetY + 10}px`;
+        zoomPreview.style.display = 'block';
+        
+        const zoomCanvas = document.createElement('canvas');
+        zoomCanvas.width = 128;
+        zoomCanvas.height = 128;
+        const zoomCtx = zoomCanvas.getContext('2d');
+        
+        zoomCtx.drawImage(
+          originalImage, 
+          Math.max(0, x - 13), 
+          Math.max(0, y - 13), 
+          26, 
+          26, 
+          0, 
+          0, 
+          128, 
+          128
+        );
+        
+        zoomCtx.strokeStyle = 'white';
+        zoomCtx.lineWidth = 2;
+        zoomCtx.beginPath();
+        zoomCtx.moveTo(64, 0);
+        zoomCtx.lineTo(64, 128);
+        zoomCtx.moveTo(0, 64);
+        zoomCtx.lineTo(128, 64);
+        zoomCtx.stroke();
+        
+        zoomPreview.innerHTML = '';
+        zoomPreview.appendChild(zoomCanvas);
+      });
+      
+      tempCanvas.addEventListener('mouseleave', () => {
+        zoomPreview.style.display = 'none';
+      });
+      
+      // 点击取色
+      tempCanvas.addEventListener('click', (e) => {
+        const rect = tempCanvas.getBoundingClientRect();
+        const x = Math.floor((e.clientX - rect.left) * scaleX);
+        const y = Math.floor((e.clientY - rect.top) * scaleY);
+        
+        const pixel = ctx.getImageData(x, y, 1, 1).data;
+        const hex = rgbToHex(pixel[0], pixel[1], pixel[2]);
+        
+        colorPicker.value = hex;
+        colorPreview.style.backgroundColor = hex;
+        
+        originalPreview.removeChild(tempCanvasContainer);
+      });
+    });
+    
+    // 处理图片按钮点击
+    processBtn.addEventListener('click', () => {
+      if (!originalImage) return;
+      
+      progressModal.classList.remove('hidden');
+      
+      setTimeout(() => {
+        processImage();
+        progressModal.classList.add('hidden');
+      }, 100);
+    });
+    
+    // 处理图片
+    function processImage() {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      canvas.width = originalImage.width;
+      canvas.height = originalImage.height;
+      ctx.drawImage(originalImage, 0, 0);
+      
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imageData.data;
+      
+      const targetColor = hexToRgb(colorPicker.value);
+      const tolerance = parseInt(colorTolerance.value);
+      
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        
+        const rDiff = Math.abs(r - targetColor.r);
+        const gDiff = Math.abs(g - targetColor.g);
+        const bDiff = Math.abs(b - targetColor.b);
+        
+        if (rDiff <= tolerance && gDiff <= tolerance && bDiff <= tolerance) {
+          data[i + 3] = 0;
+        }
+      }
+      
+      ctx.putImageData(imageData, 0, 0);
+      
+      processedPreview.innerHTML = '';
+      const imgElement = document.createElement('img');
+      imgElement.src = canvas.toDataURL('image/png');
+      imgElement.classList.add('max-w-full', 'max-h-[300px]', 'object-contain');
+      processedPreview.appendChild(imgElement);
+      
+      downloadLink.href = canvas.toDataURL('image/png');
+      downloadLink.download = 'transparent-image.png';
+      downloadContainer.style.display = 'block';
+    }
+    
+    // 辅助函数：RGB转十六进制
+    function rgbToHex(r, g, b) {
+      return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+    }
+    
+    // 辅助函数：十六进制转RGB
+    function hexToRgb(hex) {
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+      } : null;
+    }
+  </script>
+</body>
+</html>
