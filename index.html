@@ -97,46 +97,102 @@
             </p>
         </section>
 
-        <!-- Tools Grid -->
-        <section class="max-w-6xl mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Image Compression Tool Card -->
-            <div class="bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden shadow-lg card-hover animate-fade-in" style="animation-delay: 0.1s">
-                <div class="h-48 bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-                    <i class="fa fa-compress text-white text-6xl"></i>
+        <!-- 工具合集区域 -->
+        <section class="max-w-6xl mx-auto mb-16">
+            <h3 class="text-2xl font-bold mb-8 text-gray-800">工具合集</h3>
+
+            <!-- 1. 图片处理工具合集 -->
+            <div class="mb-12 p-1 border-b border-gray-200/50">
+                <!-- 合集标题 -->
+                <div class="flex items-center mb-6">
+                    <div class="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center mr-3">
+                        <i class="fa fa-picture-o text-primary text-xl"></i>
+                    </div>
+                    <h4 class="text-xl font-semibold text-gray-800">图片处理工具合集</h4>
                 </div>
-                <div class="p-6">
-                    <h3 class="text-xl font-semibold mb-2 text-gray-800">智能照片压缩</h3>
-                    <p class="text-gray-600 mb-4">高效压缩图片，保持最佳画质，节省存储空间和加载时间</p>
-                    <a href="pic_compress.html" class="inline-flex items-center justify-center w-full bg-primary hover:bg-secondary text-white px-6 py-3 rounded-xl font-medium transition-all transform hover:scale-105 shadow-md">
-                        <i class="fa fa-arrow-right mr-2"></i>使用工具
-                    </a>
+
+                <!-- 合集中的工具卡片 -->
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- 图片压缩工具 -->
+                    <div class="bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden shadow-lg card-hover animate-fade-in" style="animation-delay: 0.1s">
+                        <div class="h-48 bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                            <i class="fa fa-compress text-white text-6xl"></i>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-semibold mb-2 text-gray-800">智能照片压缩</h3>
+                            <p class="text-gray-600 mb-4">高效压缩图片，保持最佳画质，节省存储空间和加载时间</p>
+                            <a href="pic_compress.html" class="inline-flex items-center justify-center w-full bg-primary hover:bg-secondary text-white px-6 py-3 rounded-xl font-medium transition-all transform hover:scale-105 shadow-md">
+                                <i class="fa fa-arrow-right mr-2"></i>使用工具
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- 图片去除背景工具 -->
+                    <div class="bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden shadow-lg card-hover animate-fade-in" style="animation-delay: 0.2s">
+                        <div class="h-48 bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                            <i class="fa fa-scissors text-white text-6xl"></i>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-semibold mb-2 text-gray-800">智能背景去除</h3>
+                            <p class="text-gray-600 mb-4">快速去除图片背景，一键获得透明底素材，支持多种图片格式</p>
+                            <a href="pic_remove_bg.html" class="inline-flex items-center justify-center w-full bg-primary hover:bg-secondary text-white px-6 py-3 rounded-xl font-medium transition-all transform hover:scale-105 shadow-md">
+                                <i class="fa fa-arrow-right mr-2"></i>使用工具
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Placeholder Tool Cards for Future Expansion -->
-            <div class="bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden shadow-lg card-hover animate-fade-in opacity-70" style="animation-delay: 0.2s">
-                <div class="h-48 bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center">
-                    <i class="fa fa-file-text-o text-white text-6xl"></i>
-                </div>
-                <div class="p-6">
-                    <h3 class="text-xl font-semibold mb-2 text-gray-800">文档转换工具</h3>
-                    <p class="text-gray-600 mb-4">转换各种文档格式，轻松处理办公文件</p>
-                    <button disabled class="inline-flex items-center justify-center w-full bg-gray-300 text-gray-600 px-6 py-3 rounded-xl font-medium cursor-not-allowed">
-                        <i class="fa fa-clock-o mr-2"></i>即将上线
-                    </button>
-                </div>
-            </div>
+            <!-- 2. 后续更新合集（占位） -->
+            <div>
+                <h4 class="text-xl font-semibold text-gray-800 mb-6">后续更新合集（即将上线）</h4>
 
-            <div class="bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden shadow-lg card-hover animate-fade-in opacity-70" style="animation-delay: 0.3s">
-                <div class="h-48 bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center">
-                    <i class="fa fa-calculator text-white text-6xl"></i>
+                <!-- 文档处理合集（占位） -->
+                <div class="mb-8">
+                    <div class="flex items-center mb-4">
+                        <div class="w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center mr-3">
+                            <i class="fa fa-file-text-o text-gray-500"></i>
+                        </div>
+                        <h5 class="text-lg font-medium text-gray-700">文档处理工具合集</h5>
+                    </div>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div class="bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden shadow-lg opacity-70 animate-fade-in" style="animation-delay: 0.3s">
+                            <div class="h-48 bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center">
+                                <i class="fa fa-file-pdf-o text-white text-6xl"></i>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-xl font-semibold mb-2 text-gray-800">PDF格式转换</h3>
+                                <p class="text-gray-600 mb-4">轻松转换PDF与其他文档格式，支持批量处理</p>
+                                <button disabled class="inline-flex items-center justify-center w-full bg-gray-300 text-gray-600 px-6 py-3 rounded-xl font-medium cursor-not-allowed">
+                                    <i class="fa fa-clock-o mr-2"></i>即将上线
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="p-6">
-                    <h3 class="text-xl font-semibold mb-2 text-gray-800">单位转换工具</h3>
-                    <p class="text-gray-600 mb-4">快速转换各种单位，包括长度、重量、温度等</p>
-                    <button disabled class="inline-flex items-center justify-center w-full bg-gray-300 text-gray-600 px-6 py-3 rounded-xl font-medium cursor-not-allowed">
-                        <i class="fa fa-clock-o mr-2"></i>即将上线
-                    </button>
+
+                <!-- 数据转换合集（占位） -->
+                <div>
+                    <div class="flex items-center mb-4">
+                        <div class="w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center mr-3">
+                            <i class="fa fa-exchange text-gray-500"></i>
+                        </div>
+                        <h5 class="text-lg font-medium text-gray-700">数据转换工具合集</h5>
+                    </div>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div class="bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden shadow-lg opacity-70 animate-fade-in" style="animation-delay: 0.4s">
+                            <div class="h-48 bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center">
+                                <i class="fa fa-table text-white text-6xl"></i>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-xl font-semibold mb-2 text-gray-800">Excel数据提取</h3>
+                                <p class="text-gray-600 mb-4">快速提取Excel中的指定数据，生成结构化表格</p>
+                                <button disabled class="inline-flex items-center justify-center w-full bg-gray-300 text-gray-600 px-6 py-3 rounded-xl font-medium cursor-not-allowed">
+                                    <i class="fa fa-clock-o mr-2"></i>即将上线
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -191,9 +247,7 @@
     </footer>
 
     <script>
-        // Simple script for any interactive elements
         document.addEventListener('DOMContentLoaded', () => {
-            // Add any necessary JavaScript here
             console.log('工具集合页面加载完成');
         });
     </script>
