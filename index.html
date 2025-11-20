@@ -157,11 +157,11 @@
                 </div>
             </div>
 
-            <!-- 2. 后续更新合集（占位） -->
+            <!-- 2. 后续更新合集（含新增的PDF解析工具） -->
             <div>
-                <h4 class="text-xl font-semibold text-gray-800 mb-6">后续更新合集（即将上线）</h4>
+                <h4 class="text-xl font-semibold text-gray-800 mb-6">后续更新合集（含可用工具）</h4>
 
-                <!-- 文档处理合集（占位） -->
+                <!-- 文档处理工具合集（新增PDF解析工具） -->
                 <div class="mb-8">
                     <div class="flex items-center mb-4">
                         <div class="w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center mr-3">
@@ -170,9 +170,25 @@
                         <h5 class="text-lg font-medium text-gray-700">文档处理工具合集</h5>
                     </div>
                     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        <div class="bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden shadow-lg opacity-70 animate-fade-in" style="animation-delay: 0.3s">
-                            <div class="h-48 bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center">
+                        <!-- 新增：PDF解析工具（可点击跳转） -->
+                        <div class="bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden shadow-lg card-hover animate-fade-in" style="animation-delay: 0.3s">
+                            <div class="h-48 bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
                                 <i class="fa fa-file-pdf-o text-white text-6xl"></i>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-xl font-semibold mb-2 text-gray-800">PDF解析工具</h3>
+                                <p class="text-gray-600 mb-4">全格式兼容PDF解析，支持精准提取内容、多栏识别、表格提取等功能</p>
+                                <!-- 点击新开标签页跳转目标网页 -->
+                                <button onclick="window.open('https://mineru.net/OpenSourceTools/Extractor', '_blank')" class="inline-flex items-center justify-center w-full bg-primary hover:bg-secondary text-white px-6 py-3 rounded-xl font-medium transition-all transform hover:scale-105 shadow-md">
+                                    <i class="fa fa-external-link mr-2"></i>前往使用
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 原有占位：PDF格式转换 -->
+                        <div class="bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden shadow-lg opacity-70 animate-fade-in" style="animation-delay: 0.4s">
+                            <div class="h-48 bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center">
+                                <i class="fa fa-exchange text-white text-6xl"></i>
                             </div>
                             <div class="p-6">
                                 <h3 class="text-xl font-semibold mb-2 text-gray-800">PDF格式转换</h3>
