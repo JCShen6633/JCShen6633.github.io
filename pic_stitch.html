@@ -693,7 +693,7 @@
       
       const img = document.createElement('img');
       img.src = src;
-      img.className = 'w-full h-full object-cover';
+      img.className = 'w-full h-full object-contain';
       
       thumbnail.appendChild(img);
       uploadedImages.appendChild(thumbnail);
@@ -1227,7 +1227,7 @@
       resetZoom();
     }
     
-    // 导出画布（完全匹配编辑时的缩放和位置）
+    // 导出画布（优化后：保持原始图片质量）
     function exportCanvas() {
       if (images.length === 0) {
         alert('请先添加图片');
@@ -1238,102 +1238,115 @@
       const exportCanvas = document.createElement('canvas');
       const ctx = exportCanvas.getContext('2d');
       
-      // 计算导出范围（完全基于编辑时的坐标）
+      // 开启高质量渲染
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      
+      // 计算导出范围（基于原始尺寸）
       let minX = Infinity, minY = Infinity;
       let maxX = -Infinity, maxY = -Infinity;
       
-      // 收集所有图片的编辑状态（位置、大小、旋转）
+      // 计算每张图片的原始尺寸位置
       const imageStates = images.map(img => {
+        // 计算编辑时的缩放比例（原始尺寸 / 显示尺寸）
+        const scaleRatio = img.originalWidth / img.width;
+        
+        // 计算原始尺寸下的位置和大小
+        const originalX = img.x * scaleRatio;
+        const originalY = img.y * scaleRatio;
+        const originalWidth = img.originalWidth;
+        const originalHeight = img.originalHeight;
+        
+        // 计算旋转后的原始尺寸
+        const angle = (img.rotation * Math.PI) / 180;
+        const cos = Math.abs(Math.cos(angle));
+        const sin = Math.abs(Math.sin(angle));
+        const rotatedWidth = originalWidth * cos + originalHeight * sin;
+        const rotatedHeight = originalWidth * sin + originalHeight * cos;
+        
+        // 计算旋转后的偏移位置
+        const offsetX = (rotatedWidth - originalWidth) / 2;
+        const offsetY = (rotatedHeight - originalHeight) / 2;
+        
         return {
           ...img,
-          // 计算图片实际占据的矩形（考虑旋转）
-          getBoundingRect: () => {
-            const angle = (img.rotation * Math.PI) / 180;
-            const cos = Math.abs(Math.cos(angle));
-            const sin = Math.abs(Math.sin(angle));
-            const w = img.width * cos + img.height * sin;
-            const h = img.width * sin + img.height * cos;
-            const x = img.x - (w - img.width) / 2;
-            const y = img.y - (h - img.height) / 2;
-            return { x, y, width: w, height: h };
-          }
+          originalX: originalX - offsetX,
+          originalY: originalY - offsetY,
+          originalWidth,
+          originalHeight,
+          rotatedWidth,
+          rotatedHeight,
+          angle,
+          scaleRatio
         };
       });
       
-      // 确定导出画布的尺寸（包含所有可见内容）
+      // 确定导出画布的最终尺寸
       imageStates.forEach(img => {
-        const rect = img.getBoundingRect();
-        minX = Math.min(minX, rect.x);
-        minY = Math.min(minY, rect.y);
-        maxX = Math.max(maxX, rect.x + rect.width);
-        maxY = Math.max(maxY, rect.y + rect.height);
+        minX = Math.min(minX, img.originalX);
+        minY = Math.min(minY, img.originalY);
+        maxX = Math.max(maxX, img.originalX + img.rotatedWidth);
+        maxY = Math.max(maxY, img.originalY + img.rotatedHeight);
       });
       
       // 添加边距
       const padding = 20;
-      exportCanvas.width = Math.max(100, maxX - minX + padding * 2);
-      exportCanvas.height = Math.max(100, maxY - minY + padding * 2);
+      exportCanvas.width = Math.max(100, Math.ceil(maxX - minX + padding * 2));
+      exportCanvas.height = Math.max(100, Math.ceil(maxY - minY + padding * 2));
       
-      // 填充背景
+      // 填充背景色
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
       
-      // 绘制所有图片（按编辑时的缩放和位置）
+      // 绘制所有图片（使用原始尺寸，保持高质量）
       imageStates.forEach(img => {
-        // 创建临时画布处理变换
+        // 创建临时画布处理旋转和透明度
         const tempCanvas = document.createElement('canvas');
         const tempCtx = tempCanvas.getContext('2d');
+        tempCanvas.width = img.originalWidth;
+        tempCanvas.height = img.originalHeight;
         
-        // 使用编辑时的尺寸（不是原始尺寸）
-        tempCanvas.width = img.width;
-        tempCanvas.height = img.height;
-        
-        // 绘制缩放后的图片（匹配编辑时的大小）
+        // 绘制原始分辨率图片
         tempCtx.globalAlpha = img.opacity / 100;
         tempCtx.drawImage(
-          img.img, 
+          img.img,
           0, 0, img.originalWidth, img.originalHeight,
-          0, 0, img.width, img.height
+          0, 0, img.originalWidth, img.originalHeight
         );
         
         // 处理旋转
         if (img.rotation !== 0) {
           const rotatedCanvas = document.createElement('canvas');
           const rotatedCtx = rotatedCanvas.getContext('2d');
-          
-          const angle = (img.rotation * Math.PI) / 180;
-          const cos = Math.abs(Math.cos(angle));
-          const sin = Math.abs(Math.sin(angle));
-          const rotatedWidth = img.width * cos + img.height * sin;
-          const rotatedHeight = img.width * sin + img.height * cos;
-          
-          rotatedCanvas.width = rotatedWidth;
-          rotatedCanvas.height = rotatedHeight;
+          rotatedCanvas.width = img.rotatedWidth;
+          rotatedCanvas.height = img.rotatedHeight;
           
           // 旋转并居中
-          rotatedCtx.translate(rotatedWidth / 2, rotatedHeight / 2);
-          rotatedCtx.rotate(angle);
-          rotatedCtx.drawImage(tempCanvas, -img.width / 2, -img.height / 2);
+          rotatedCtx.imageSmoothingQuality = 'high';
+          rotatedCtx.translate(img.rotatedWidth / 2, img.rotatedHeight / 2);
+          rotatedCtx.rotate(img.angle);
+          rotatedCtx.drawImage(tempCanvas, -img.originalWidth / 2, -img.originalHeight / 2);
           
-          // 绘制到导出画布（匹配编辑时的位置）
+          // 绘制到导出画布
           ctx.drawImage(
             rotatedCanvas,
-            img.x - minX + padding - (rotatedWidth - img.width) / 2,
-            img.y - minY + padding - (rotatedHeight - img.height) / 2
+            img.originalX - minX + padding,
+            img.originalY - minY + padding
           );
         } else {
-          // 直接绘制（匹配编辑时的位置和大小）
+          // 直接绘制原始尺寸图片
           ctx.drawImage(
             tempCanvas,
-            img.x - minX + padding,
-            img.y - minY + padding
+            img.originalX - minX + padding,
+            img.originalY - minY + padding
           );
         }
       });
       
-      // 下载图片
+      // 下载高清图片
       const link = document.createElement('a');
       link.download = `拼接图片_${new Date().getTime()}.png`;
+      // 使用最高质量参数导出
       link.href = exportCanvas.toDataURL('image/png', 1.0);
       link.click();
     }
