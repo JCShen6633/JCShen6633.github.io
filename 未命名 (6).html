@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>图片拼接工具</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#165DFF',
+            secondary: '#36CFC9',
+            neutral: '#F5F7FA',
+            dark: '#1D2129',
+            light: '#FFFFFF',
+          },
+          fontFamily: {
+            inter: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .shadow-soft {
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      }
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+      }
+      .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      .image-container {
+        touch-action: none;
+      }
+    }
+  </style>
+</head>
+
+<body class="font-inter bg-neutral text-dark min-h-screen flex flex-col">
+  <header class="bg-white shadow-sm py-3 px-4 md:px-6 flex items-center justify-between">
+    <div class="flex items-center space-x-2">
+      <i class="fa fa-picture-o text-primary text-2xl"></i>
+      <h1 class="text-xl font-bold">图片拼接工具</h1>
+    </div>
+    <div class="flex items-center space-x-4">
+      <button id="helpBtn" class="text-gray-600 hover:text-primary transition-colors">
+        <i class="fa fa-question-circle mr-1"></i>帮助
+      </button>
+      <button id="exportBtn" class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg transition-colors flex items-center">
+        <i class="fa fa-download mr-2"></i>导出图片
+      </button>
+    </div>
+  </header>
+
+  <main class="flex-1 flex flex-col md:flex-row overflow-hidden">
+    <aside class="w-full md:w-64 bg-white border-r border-gray-200 p-4 flex flex-col">
+      <div class="mb-6">
+        <h2 class="text-lg font-semibold mb-3">上传图片</h2>
+        <div id="dropArea" class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer">
+          <i class="fa fa-cloud-upload text-3xl text-gray-400 mb-2"></i>
+          <p class="text-gray-500">拖放图片到这里，或<span class="text-primary">点击上传</span></p>
+          <input type="file" id="fileInput" accept="image/*" multiple class="hidden">
+        </div>
+        <div id="uploadedImages" class="mt-4 max-h-40 overflow-y-auto scrollbar-hide">
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <h2 class="text-lg font-semibold mb-3">布局模式</h2>
+        <div class="grid grid-cols-3 gap-2">
+          <button class="layout-btn p-2 border border-gray-200 rounded hover:border-primary hover:bg-primary/5 transition-colors" data-layout="free">
+            <i class="fa fa-arrows text-lg block mx-auto"></i>
+            <span class="text-xs block mt-1">自由</span>
+          </button>
+          <button class="layout-btn p-2 border border-gray-200 rounded hover:border-primary hover:bg-primary/5 transition-colors" data-layout="horizontal">
+            <i class="fa fa-arrows-h text-lg block mx-auto"></i>
+            <span class="text-xs block mt-1">横向</span>
+          </button>
+          <button class="layout-btn p-2 border border-gray-200 rounded hover:border-primary hover:bg-primary/5 transition-colors" data-layout="vertical">
+            <i class="fa fa-arrows-v text-lg block mx-auto"></i>
+            <span class="text-xs block mt-1">纵向</span>
+          </button>
+          <button class="layout-btn p-2 border border-gray-200 rounded hover:border-primary hover:bg-primary/5 transition-colors" data-layout="grid-2">
+            <div class="grid grid-cols-2 gap-1 mx-auto">
+              <div class="w-3 h-3 bg-gray-200 rounded-sm"></div>
+              <div class="w-3 h-3 bg-gray-200 rounded-sm"></div>
+            </div>
+            <span class="text-xs block mt-1">2格</span>
+          </button>
+          <button class="layout-btn p-2 border border-gray-200 rounded hover:border-primary hover:bg-primary/5 transition-colors" data-layout="grid-3">
+            <div class="grid grid-cols-3 gap-1 mx-auto">
+              <div class="w-2 h-2 bg-gray-200 rounded-sm"></div>
+              <div class="w-2 h-2 bg-gray-200 rounded-sm"></div>
+              <div class="w-2 h-2 bg-gray-200 rounded-sm"></div>
+            </div>
+            <span class="text-xs block mt-1">3格</span>
+          </button>
+          <button class="layout-btn p-2 border border-gray-200 rounded hover:border-primary hover:bg-primary/5 transition-colors" data-layout="masonry">
+            <div class="flex flex-col gap-1 h-6">
+              <div class="w-3 h-2 bg-gray-200 rounded-sm self-start"></div>
+              <div class="w-3 h-3 bg-gray-200 rounded-sm self-end"></div>
+              <div class="w-3 h-1 bg-gray-200 rounded-sm self-start"></div>
+            </div>
+            <span class="text-xs block mt-1">瀑布流</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="mt-auto">
+        <h2 class="text-lg font-semibold mb-3">操作</h2>
+        <div class="grid grid-cols-2 gap-2">
+          <button id="clearBtn" class="flex items-center justify-center p-2 border border-gray-200 rounded hover:border-red-400 hover:bg-red-50 text-gray-600 hover:text-red-500 transition-colors">
+            <i class="fa fa-trash mr-1"></i>
+            <span>清空</span>
+          </button>
+          <button id="resetBtn" class="flex items-center justify-center p-2 border border-gray-200 rounded hover:border-primary hover:bg-primary/5 text-gray-600 hover:text-primary transition-colors">
+            <i class="fa fa-refresh mr-1"></i>
+            <span>重置</span>
+          </button>
+          <button id="bringForwardBtn" class="flex items-center justify-center p-2 border border-gray-200 rounded hover:border-primary hover:bg-primary/5 text-gray-600 hover:text-primary transition-colors">
+            <i class="fa fa-arrow-up mr-1"></i>
+            <span>上移</span>
+          </button>
+          <button id="sendBackwardBtn" class="flex items-center justify-center p-2 border border-gray-200 rounded hover:border-primary hover:bg-primary/5 text-gray-600 hover:text-primary transition-colors">
+            <i class="fa fa-arrow-down mr-1"></i>
+            <span>下移</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <section class="flex-1 relative overflow-hidden bg-gray-100">
+      <div id="canvasContainer" class="absolute inset-0 overflow-auto">
+        <div id="canvas" class="relative mx-auto my-8 bg-white shadow-soft min-w-[600px] min-h-[400px] w-[800px] h-[600px]">
+          <div id="emptyState" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
+            <i class="fa fa-picture-o text-5xl mb-4"></i>
+            <p>将图片拖放到这里开始拼接</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="absolute bottom-4 right-4 bg-white rounded-lg shadow-md p-1 flex items-center">
+        <button id="zoomOut" class="p-2 text-gray-600 hover:text-primary transition-colors">
+          <i class="fa fa-search-minus"></i>
+        </button>
+        <div class="w-16 text-center text-sm border-x border-gray-200">
+          <span id="zoomLevel">100%</span>
+        </div>
+        <button id="zoomIn" class="p-2 text-gray-600 hover:text-primary transition-colors">
+          <i class="fa fa-search-plus"></i>
+        </button>
+        <button id="zoomReset" class="p-2 text-gray-600 hover:text-primary transition-colors">
+          <i class="fa fa-arrows-alt"></i>
+        </button>
+      </div>
+    </section>
+
+    <aside id="propertiesPanel" class="w-full md:w-64 bg-white border-l border-gray-200 p-4 hidden md:block">
+      <h2 class="text-lg font-semibold mb-3">属性</h2>
+      <div id="noSelection" class="text-center text-gray-500 py-8">
+        <i class="fa fa-hand-pointer-o text-2xl mb-2"></i>
+        <p>选择一个图片进行编辑</p>
+      </div>
+      <div id="imageProperties" class="hidden">
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">位置</label>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-xs text-gray-500">X:</label>
+              <input type="number" id="posX" class="w-full border border-gray-300 rounded-md px-2 py-1 text-sm">
+            </div>
+            <div>
+              <label class="text-xs text-gray-500">Y:</label>
+              <input type="number" id="posY" class="w-full border border-gray-300 rounded-md px-2 py-1 text-sm">
+            </div>
+          </div>
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">尺寸</label>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-xs text-gray-500">宽度:</label>
+              <input type="number" id="width" class="w-full border border-gray-300 rounded-md px-2 py-1 text-sm">
+            </div>
+            <div>
+              <label class="text-xs text-gray-500">高度:</label>
+              <input type="number" id="height" class="w-full border border-gray-300 rounded-md px-2 py-1 text-sm">
+            </div>
+          </div>
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">旋转</label>
+          <input type="range" id="rotation" min="0" max="360" value="0" class="w-full accent-primary">
+          <div class="flex justify-between text-xs text-gray-500 mt-1">
+            <span>0°</span>
+            <span id="rotationValue">0°</span>
+            <span>360°</span>
+          </div>
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">透明度</label>
+          <input type="range" id="opacity" min="0" max="100" value="100" class="w-full accent-primary">
+          <div class="flex justify-between text-xs text-gray-500 mt-1">
+            <span>0%</span>
+            <span id="opacityValue">100%</span>
+            <span>100%</span>
+          </div>
+        </div>
+        
+        <button id="removeBtn" class="w-full mt-4 py-2 bg-red-50 text-red-500 rounded-md hover:bg-red-100 transition-colors flex items-center justify-center">
+          <i class="fa fa-trash mr-2"></i>删除图片
+        </button>
+      </div>
+    </aside>
+  </main>
+
+  <div id="helpModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg max-w-md w-full max-h-[80vh] overflow-y-auto m-4">
+      <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+        <h3 class="text-lg font-semibold">使用帮助</h3>
+        <button id="closeHelp" class="text-gray-500 hover:text-gray-700">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+      <div class="p-4">
+        <div class="mb-4">
+          <h4 class="font-medium mb-2">基本操作</h4>
+          <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+            <li>拖放图片到上传区域或工作区</li>
+            <li>点击选择图片，拖动可调整位置</li>
+            <li>拖动图片边缘可调整大小</li>
+          </ul>
+        </div>
+        <div class="mb-4">
+          <h4 class="font-medium mb-2">布局模式</h4>
+          <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+            <li>自由模式：完全自定义图片位置和大小</li>
+            <li>横向/纵向：图片将自动按水平或垂直方向排列</li>
+            <li>网格模式：图片将自动排列在网格中</li>
+            <li>瀑布流：图片将按高度自动排列</li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-medium mb-2">导出图片</h4>
+          <p class="text-sm text-gray-600">完成拼接后，点击右上角"导出图片"按钮保存结果</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="md:hidden bg-white border-t border-gray-200 p-2 flex justify-around">
+    <button id="mobilePropsBtn" class="flex flex-col items-center p-1 text-primary">
+      <i class="fa fa-sliders"></i>
+      <span class="text-xs mt-1">属性</span>
+    </button>
+    <button id="mobileLayoutBtn" class="flex flex-col items-center p-1 text-gray-600">
+      <i class="fa fa-th"></i>
+      <span class="text-xs mt-1">布局</span>
+    </button>
+    <button id="mobileUploadBtn" class="flex flex-col items-center p-1 text-gray-600">
+      <i class="fa fa-upload"></i>
+      <span class="text-xs mt-1">上传</span>
+    </button>
+    <button id="mobileExportBtn" class="flex flex-col items-center p-1 text-gray-600">
+      <i class="fa fa-download"></i>
+      <span class="text-xs mt-1">导出</span>
+    </button>
+  </div>
+
+  <script>
+    // 全局变量
+    let currentScale = 1;
+    let selectedImage = null;
+    let images = [];
+    let currentLayout = 'free';
+    let isDragging = false;
+    let dragOffset = { x: 0, y: 0 };
+    let resizeHandle = null;
+    const sensitivity = 1.0;
+    
+    // DOM 元素
+    const canvas = document.getElementById('canvas');
+    const dropArea = document.getElementById('dropArea');
+    const fileInput = document.getElementById('fileInput');
+    const uploadedImages = document.getElementById('uploadedImages');
+    const emptyState = document.getElementById('emptyState');
+    const exportBtn = document.getElementById('exportBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const bringForwardBtn = document.getElementById('bringForwardBtn');
+    const sendBackwardBtn = document.getElementById('sendBackwardBtn');
+    const helpBtn = document.getElementById('helpBtn');
+    const helpModal = document.getElementById('helpModal');
+    const closeHelp = document.getElementById('closeHelp');
+    const zoomIn = document.getElementById('zoomIn');
+    const zoomOut = document.getElementById('zoomOut');
+    const zoomReset = document.getElementById('zoomReset');
+    const zoomLevel = document.getElementById('zoomLevel');
+    const propertiesPanel = document.getElementById('propertiesPanel');
+    const noSelection = document.getElementById('noSelection');
+    const imageProperties = document.getElementById('imageProperties');
+    const posX = document.getElementById('posX');
+    const posY = document.getElementById('posY');
+    const width = document.getElementById('width');
+    const height = document.getElementById('height');
+    const rotation = document.getElementById('rotation');
+    const rotationValue = document.getElementById('rotationValue');
+    const opacity = document.getElementById('opacity');
+    const opacityValue = document.getElementById('opacityValue');
+    const removeBtn = document.getElementById('removeBtn');
+    const layoutBtns = document.querySelectorAll('.layout-btn');
+    const canvasContainer = document.getElementById('canvasContainer');
+    
+    // 初始化
+    function init() {
+      setupEventListeners();
+    }
+    
+    // 设置事件监听器
+    function setupEventListeners() {
+      // 拖放上传
+      dropArea.addEventListener('click', () => fileInput.click());
+      dropArea.addEventListener('dragover', handleDragOver);
+      dropArea.addEventListener('dragleave', handleDragLeave);
+      dropArea.addEventListener('drop', handleDrop);
+      fileInput.addEventListener('change', handleFileSelect);
+      
+      // 画布事件
+      canvas.addEventListener('click', handleCanvasClick);
+      
+      // 按钮事件
+      exportBtn.addEventListener('click', exportCanvas);
+      clearBtn.addEventListener('click', clearCanvas);
+      resetBtn.addEventListener('click', resetCanvas);
+      bringForwardBtn.addEventListener('click', bringForward);
+      sendBackwardBtn.addEventListener('click', sendBackward);
+      
+      // 帮助弹窗
+      helpBtn.addEventListener('click', () => helpModal.classList.remove('hidden'));
+      closeHelp.addEventListener('click', () => helpModal.classList.add('hidden'));
+      helpModal.addEventListener('click', (e) => {
+        if (e.target === helpModal) helpModal.classList.add('hidden');
+      });
+      
+      // 缩放控制
+      zoomIn.addEventListener('click', () => zoomCanvas(0.1));
+      zoomOut.addEventListener('click', () => zoomCanvas(-0.1));
+      zoomReset.addEventListener('click', resetZoom);
+      
+      // 属性编辑
+      posX.addEventListener('input', updateImagePosition);
+      posY.addEventListener('input', updateImagePosition);
+      width.addEventListener('input', updateImageSize);
+      height.addEventListener('input', updateImageSize);
+      rotation.addEventListener('input', updateImageRotation);
+      opacity.addEventListener('input', updateImageOpacity);
+      removeBtn.addEventListener('click', removeSelectedImage);
+      
+      // 布局按钮
+      layoutBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          layoutBtns.forEach(b => b.classList.remove('border-primary', 'bg-primary/5'));
+          btn.classList.add('border-primary', 'bg-primary/5');
+          currentLayout = btn.dataset.layout;
+          applyLayout();
+        });
+      });
+      
+      // 默认选中自由布局
+      document.querySelector('.layout-btn[data-layout="free"]').classList.add('border-primary', 'bg-primary/5');
+    }
+    
+    // 处理拖放事件
+    function handleDragOver(e) {
+      e.preventDefault();
+      dropArea.classList.add('border-primary', 'bg-primary/5');
+    }
+    
+    function handleDragLeave() {
+      dropArea.classList.remove('border-primary', 'bg-primary/5');
+    }
+    
+    function handleDrop(e) {
+      e.preventDefault();
+      dropArea.classList.remove('border-primary', 'bg-primary/5');
+      
+      if (e.dataTransfer.files.length) {
+        handleFiles(e.dataTransfer.files);
+      }
+    }
+    
+    // 处理文件选择
+    function handleFileSelect(e) {
+      if (e.target.files.length) {
+        handleFiles(e.target.files);
+      }
+    }
+    
+    // 处理文件
+    function handleFiles(files) {
+      Array.from(files).forEach(file => {
+        if (!file.type.match('image.*')) return;
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          addImage(e.target.result);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    
+    // 添加图片到画布
+    function addImage(src) {
+      const img = new Image();
+      img.onload = () => {
+        // 创建图片容器
+        const imgContainer = document.createElement('div');
+        imgContainer.className = 'absolute cursor-move transition-none duration-0 select-none image-container';
+        imgContainer.dataset.id = Date.now();
+        
+        // 设置初始尺寸（限制最大尺寸）
+        let w = img.width;
+        let h = img.height;
+        const maxSize = 300;
+        
+        if (w > maxSize || h > maxSize) {
+          const ratio = Math.min(maxSize / w, maxSize / h);
+          w *= ratio;
+          h *= ratio;
+        }
+        
+        // 设置初始位置（居中）
+        const x = (canvas.offsetWidth - w) / 2;
+        const y = (canvas.offsetHeight - h) / 2;
+        
+        imgContainer.style.width = `${w}px`;
+        imgContainer.style.height = `${h}px`;
+        imgContainer.style.left = `${x}px`;
+        imgContainer.style.top = `${y}px`;
+        
+        // 创建图片元素
+        const imgElement = document.createElement('img');
+        imgElement.src = src;
+        imgElement.className = 'w-full h-full object-contain';
+        imgElement.draggable = false;
+        
+        // 创建调整大小的手柄
+        const resizeHandles = createResizeHandles();
+        resizeHandles.forEach(handle => imgContainer.appendChild(handle));
+        
+        imgContainer.appendChild(imgElement);
+        canvas.appendChild(imgContainer);
+        
+        // 为图片容器添加点击事件
+        imgContainer.addEventListener('click', (e) => {
+          e.stopPropagation();
+          selectImage(imgContainer.dataset.id);
+        });
+        
+        // 隐藏空状态
+        if (emptyState) emptyState.remove();
+        
+        // 添加到图片列表
+        images.push({
+          id: imgContainer.dataset.id,
+          element: imgContainer,
+          img: imgElement,
+          src: src,
+          x: x,
+          y: y,
+          width: w,
+          height: h,
+          rotation: 0,
+          opacity: 100,
+          originalWidth: img.width,
+          originalHeight: img.height
+        });
+        
+        // 添加缩略图
+        addThumbnail(src, imgContainer.dataset.id);
+        
+        // 选中新添加的图片
+        selectImage(imgContainer.dataset.id);
+        
+        // 如果不是自由布局，应用布局
+        if (currentLayout !== 'free') {
+          applyLayout();
+        }
+      };
+      img.src = src;
+    }
+    
+    // 创建调整大小的手柄
+    function createResizeHandles() {
+      const handles = [];
+      const positions = ['tl', 't', 'tr', 'r', 'br', 'b', 'bl', 'l'];
+      
+      positions.forEach(pos => {
+        const handle = document.createElement('div');
+        handle.className = 'absolute w-4 h-4 bg-primary rounded-full border-2 border-white shadow-md opacity-0 hover:opacity-100 transition-opacity';
+        handle.dataset.handle = pos;
+        
+        // 设置位置
+        switch(pos) {
+          case 'tl':
+            handle.style.top = '-4px';
+            handle.style.left = '-4px';
+            handle.style.cursor = 'nwse-resize';
+            break;
+          case 't':
+            handle.style.top = '-4px';
+            handle.style.left = '50%';
+            handle.style.transform = 'translateX(-50%)';
+            handle.style.cursor = 'ns-resize';
+            break;
+          case 'tr':
+            handle.style.top = '-4px';
+            handle.style.right = '-4px';
+            handle.style.cursor = 'nesw-resize';
+            break;
+          case 'r':
+            handle.style.top = '50%';
+            handle.style.right = '-4px';
+            handle.style.transform = 'translateY(-50%)';
+            handle.style.cursor = 'ew-resize';
+            break;
+          case 'br':
+            handle.style.bottom = '-4px';
+            handle.style.right = '-4px';
+            handle.style.cursor = 'nwse-resize';
+            break;
+          case 'b':
+            handle.style.bottom = '-4px';
+            handle.style.left = '50%';
+            handle.style.transform = 'translateX(-50%)';
+            handle.style.cursor = 'ns-resize';
+            break;
+          case 'bl':
+            handle.style.bottom = '-4px';
+            handle.style.left = '-4px';
+            handle.style.cursor = 'nesw-resize';
+            break;
+          case 'l':
+            handle.style.top = '50%';
+            handle.style.left = '-4px';
+            handle.style.transform = 'translateY(-50%)';
+            handle.style.cursor = 'ew-resize';
+            break;
+        }
+        
+        // 添加事件监听
+        handle.addEventListener('mousedown', startResize);
+        handles.push(handle);
+      });
+      
+      return handles;
+    }
+    
+    // 开始调整大小
+    function startResize(e) {
+      e.stopPropagation();
+      if (!selectedImage) return;
+      
+      isDragging = true;
+      resizeHandle = e.target.dataset.handle;
+      const imgContainer = selectedImage.element;
+      
+      dragOffset = {
+        x: e.clientX,
+        y: e.clientY,
+        width: parseInt(imgContainer.style.width),
+        height: parseInt(imgContainer.style.height),
+        left: parseInt(imgContainer.style.left),
+        top: parseInt(imgContainer.style.top)
+      };
+      
+      function handleMouseMove(e) {
+        resizeImage(e);
+        requestAnimationFrame(() => handleMouseMove);
+      }
+      
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        stopResize();
+      });
+      
+      document.body.style.cursor = e.target.style.cursor;
+    }
+    
+    // 调整图片大小
+    function resizeImage(e) {
+      if (!isDragging || !selectedImage || !resizeHandle) return;
+      
+      const scaleFactor = 1 / currentScale;
+      const dx = (e.clientX - dragOffset.x) * scaleFactor * sensitivity;
+      const dy = (e.clientY - dragOffset.y) * scaleFactor * sensitivity;
+      const imgContainer = selectedImage.element;
+      
+      let newWidth = dragOffset.width;
+      let newHeight = dragOffset.height;
+      let newLeft = dragOffset.left;
+      let newTop = dragOffset.top;
+      
+      // 保持宽高比的调整（按住Shift键）
+      const aspectRatio = dragOffset.width / dragOffset.height;
+      const maintainRatio = e.shiftKey;
+      
+      switch(resizeHandle) {
+        case 'tr':
+          newWidth = Math.max(50, dragOffset.width + dx);
+          newHeight = maintainRatio ? newWidth / aspectRatio : Math.max(50, dragOffset.height - dy);
+          newTop = dragOffset.top + (dragOffset.height - newHeight);
+          break;
+        case 'br':
+          newWidth = Math.max(50, dragOffset.width + dx);
+          newHeight = maintainRatio ? newWidth / aspectRatio : Math.max(50, dragOffset.height + dy);
+          break;
+        case 'bl':
+          newWidth = Math.max(50, dragOffset.width - dx);
+          newHeight = maintainRatio ? newWidth / aspectRatio : Math.max(50, dragOffset.height + dy);
+          newLeft = dragOffset.left + (dragOffset.width - newWidth);
+          break;
+        case 'tl':
+          newWidth = Math.max(50, dragOffset.width - dx);
+          newHeight = maintainRatio ? newWidth / aspectRatio : Math.max(50, dragOffset.height - dy);
+          newLeft = dragOffset.left + (dragOffset.width - newWidth);
+          newTop = dragOffset.top + (dragOffset.height - newHeight);
+          break;
+        case 'r':
+          newWidth = Math.max(50, dragOffset.width + dx);
+          newHeight = maintainRatio ? newWidth / aspectRatio : dragOffset.height;
+          break;
+        case 'l':
+          newWidth = Math.max(50, dragOffset.width - dx);
+          newHeight = maintainRatio ? newWidth / aspectRatio : dragOffset.height;
+          newLeft = dragOffset.left + (dragOffset.width - newWidth);
+          break;
+        case 't':
+          newHeight = Math.max(50, dragOffset.height - dy);
+          newWidth = maintainRatio ? newHeight * aspectRatio : dragOffset.width;
+          newTop = dragOffset.top + (dragOffset.height - newHeight);
+          break;
+        case 'b':
+          newHeight = Math.max(50, dragOffset.height + dy);
+          newWidth = maintainRatio ? newHeight * aspectRatio : dragOffset.width;
+          break;
+      }
+      
+      // 应用新尺寸和位置
+      imgContainer.style.width = `${newWidth}px`;
+      imgContainer.style.height = `${newHeight}px`;
+      imgContainer.style.left = `${newLeft}px`;
+      imgContainer.style.top = `${newTop}px`;
+      
+      // 更新图片数据
+      selectedImage.width = newWidth;
+      selectedImage.height = newHeight;
+      selectedImage.x = newLeft;
+      selectedImage.y = newTop;
+      
+      // 更新属性面板
+      updatePropertiesPanel();
+    }
+    
+    // 停止调整大小
+    function stopResize() {
+      isDragging = false;
+      resizeHandle = null;
+      document.body.style.cursor = '';
+    }
+    
+    // 添加缩略图
+    function addThumbnail(src, id) {
+      const thumbnail = document.createElement('div');
+      thumbnail.className = 'inline-block relative w-16 h-16 m-1 border border-gray-200 rounded overflow-hidden cursor-pointer hover:border-primary';
+      thumbnail.dataset.id = id;
+      
+      const img = document.createElement('img');
+      img.src = src;
+      img.className = 'w-full h-full object-cover';
+      
+      thumbnail.appendChild(img);
+      uploadedImages.appendChild(thumbnail);
+      
+      // 点击缩略图选中图片
+      thumbnail.addEventListener('click', (e) => {
+        e.stopPropagation();
+        selectImage(id);
+      });
+    }
+    
+    // 选择图片
+    function selectImage(id) {
+      // 取消之前的选择
+      if (selectedImage) {
+        selectedImage.element.classList.remove('ring-2', 'ring-primary', 'ring-offset-2');
+        selectedImage.element.querySelectorAll('div').forEach(handle => {
+          handle.style.opacity = '0';
+        });
+        // 移除之前的拖拽事件
+        selectedImage.element.removeEventListener('mousedown', startDrag);
+      }
+      
+      // 选中新图片
+      selectedImage = images.find(img => img.id === id);
+      
+      if (selectedImage) {
+        selectedImage.element.classList.add('ring-2', 'ring-primary', 'ring-offset-2');
+        // 显示调整手柄
+        selectedImage.element.querySelectorAll('div').forEach(handle => {
+          handle.style.opacity = '1';
+        });
+        
+        // 添加拖拽事件
+        selectedImage.element.addEventListener('mousedown', startDrag);
+        
+        // 显示属性面板
+        noSelection.classList.add('hidden');
+        imageProperties.classList.remove('hidden');
+        
+        // 更新属性面板值
+        updatePropertiesPanel();
+      } else {
+        // 没有选中图片
+        noSelection.classList.remove('hidden');
+        imageProperties.classList.add('hidden');
+      }
+    }
+    
+    // 开始拖拽
+    function startDrag(e) {
+      if (e.target.dataset.handle) return; // 如果点击的是调整手柄，不启动拖拽
+      
+      e.stopPropagation();
+      isDragging = true;
+      
+      const imgContainer = selectedImage.element;
+      const rect = imgContainer.getBoundingClientRect();
+      const canvasRect = canvas.getBoundingClientRect();
+      
+      // 计算拖拽偏移，考虑缩放因素
+      dragOffset = {
+        x: (e.clientX - rect.left) / currentScale,
+        y: (e.clientY - rect.top) / currentScale,
+        startX: e.clientX,
+        startY: e.clientY
+      };
+      
+      // 把选中的元素放到最上层
+      const zIndex = getHighestZIndex() + 1;
+      imgContainer.style.zIndex = zIndex;
+      selectedImage.zIndex = zIndex;
+      
+      function handleMouseMove(e) {
+        dragImage(e);
+        requestAnimationFrame(() => handleMouseMove);
+      }
+      
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        stopDrag();
+      });
+    }
+    
+    // 拖拽图片
+    function dragImage(e) {
+      if (!isDragging || !selectedImage) return;
+      
+      const canvasRect = canvas.getBoundingClientRect();
+      const scaleFactor = 1 / currentScale;
+      const x = (e.clientX - canvasRect.left) * scaleFactor - dragOffset.x;
+      const y = (e.clientY - canvasRect.top) * scaleFactor - dragOffset.y;
+      
+      // 应用灵敏度系数
+      const finalX = x * sensitivity;
+      const finalY = y * sensitivity;
+      
+      selectedImage.element.style.left = `${finalX}px`;
+      selectedImage.element.style.top = `${finalY}px`;
+      
+      // 更新图片数据
+      selectedImage.x = finalX;
+      selectedImage.y = finalY;
+      
+      // 更新属性面板
+      updatePropertiesPanel();
+    }
+    
+    // 停止拖拽
+    function stopDrag() {
+      isDragging = false;
+    }
+    
+    // 获取最高的z-index
+    function getHighestZIndex() {
+      return images.reduce((max, img) => {
+        const zIndex = parseInt(img.element.style.zIndex) || 1;
+        return Math.max(max, zIndex);
+      }, 0);
+    }
+    
+    // 处理画布点击
+    function handleCanvasClick(e) {
+      // 检查是否点击了图片
+      const clickedImage = images.find(img => 
+        img.element.contains(e.target) && 
+        !e.target.dataset.handle // 排除调整手柄
+      );
+      
+      if (clickedImage) {
+        // 如果点击了图片，选中它
+        selectImage(clickedImage.id);
+      } else if (e.target === canvas || e.target === canvasContainer) {
+        // 点击画布空白处，取消选择
+        if (selectedImage) {
+          selectedImage.element.classList.remove('ring-2', 'ring-primary', 'ring-offset-2');
+          selectedImage.element.querySelectorAll('div').forEach(handle => {
+            handle.style.opacity = '0';
+          });
+          selectedImage.element.removeEventListener('mousedown', startDrag);
+          selectedImage = null;
+          
+          // 显示无选择状态
+          noSelection.classList.remove('hidden');
+          imageProperties.classList.add('hidden');
+        }
+      }
+    }
+    
+    // 更新属性面板
+    function updatePropertiesPanel() {
+      if (!selectedImage) return;
+      
+      posX.value = Math.round(selectedImage.x);
+      posY.value = Math.round(selectedImage.y);
+      width.value = Math.round(selectedImage.width);
+      height.value = Math.round(selectedImage.height);
+      rotation.value = selectedImage.rotation;
+      rotationValue.textContent = `${selectedImage.rotation}°`;
+      opacity.value = selectedImage.opacity;
+      opacityValue.textContent = `${selectedImage.opacity}%`;
+    }
+    
+    // 更新图片位置
+    function updateImagePosition() {
+      if (!selectedImage) return;
+      
+      const x = parseInt(posX.value) || 0;
+      const y = parseInt(posY.value) || 0;
+      
+      selectedImage.element.style.left = `${x}px`;
+      selectedImage.element.style.top = `${y}px`;
+      
+      selectedImage.x = x;
+      selectedImage.y = y;
+    }
+    
+    // 更新图片大小
+    function updateImageSize() {
+      if (!selectedImage) return;
+      
+      const w = parseInt(width.value) || 50;
+      const h = parseInt(height.value) || 50;
+      
+      // 保持宽高比（按住Shift键）
+      if (event.shiftKey && selectedImage.originalWidth) {
+        const ratio = selectedImage.originalWidth / selectedImage.originalHeight;
+        if (event.target === width) {
+          height.value = Math.round(w / ratio);
+        } else {
+          width.value = Math.round(h * ratio);
+        }
+      }
+      
+      selectedImage.element.style.width = `${w}px`;
+      selectedImage.element.style.height = `${h}px`;
+      
+      selectedImage.width = w;
+      selectedImage.height = h;
+    }
+    
+    // 更新图片旋转
+    function updateImageRotation() {
+      if (!selectedImage) return;
+      
+      const rot = parseInt(rotation.value) || 0;
+      rotationValue.textContent = `${rot}°`;
+      
+      selectedImage.element.style.transform = `rotate(${rot}deg)`;
+      selectedImage.rotation = rot;
+    }
+    
+    // 更新图片透明度
+    function updateImageOpacity() {
+      if (!selectedImage) return;
+      
+      const op = parseInt(opacity.value) || 0;
+      opacityValue.textContent = `${op}%`;
+      
+      selectedImage.element.style.opacity = op / 100;
+      selectedImage.opacity = op;
+    }
+    
+    // 移除选中的图片
+    function removeSelectedImage() {
+      if (!selectedImage) return;
+      
+      // 从DOM中移除
+      selectedImage.element.remove();
+      
+      // 从数组中移除
+      const index = images.findIndex(img => img.id === selectedImage.id);
+      if (index !== -1) {
+        images.splice(index, 1);
+      }
+      
+      // 从缩略图中移除
+      const thumbnail = uploadedImages.querySelector(`[data-id="${selectedImage.id}"]`);
+      if (thumbnail) {
+        thumbnail.remove();
+      }
+      
+      // 重置选择
+      selectedImage = null;
+      noSelection.classList.remove('hidden');
+      imageProperties.classList.add('hidden');
+      
+      // 如果没有图片了，显示空状态
+      if (images.length === 0) {
+        canvas.appendChild(emptyState);
+      } else if (currentLayout !== 'free') {
+        applyLayout();
+      }
+    }
+    
+    // 应用布局
+    function applyLayout() {
+      if (images.length === 0) return;
+      
+      // 重置所有图片的变换和z-index
+      images.forEach(img => {
+        img.element.style.transform = `rotate(0deg)`;
+        img.rotation = 0;
+        img.element.style.zIndex = 1;
+      });
+      
+      switch(currentLayout) {
+        case 'horizontal':
+          applyHorizontalLayout();
+          break;
+        case 'vertical':
+          applyVerticalLayout();
+          break;
+        case 'grid-2':
+          applyGridLayout(2);
+          break;
+        case 'grid-3':
+          applyGridLayout(3);
+          break;
+        case 'masonry':
+          applyMasonryLayout();
+          break;
+      }
+      
+      // 更新属性面板
+      updatePropertiesPanel();
+    }
+    
+    // 应用水平布局
+    function applyHorizontalLayout() {
+      const canvasWidth = canvas.offsetWidth;
+      const canvasHeight = canvas.offsetHeight;
+      const spacing = 20;
+      const totalSpacing = (images.length - 1) * spacing;
+      const availableWidth = canvasWidth - totalSpacing - 40; // 减去边距
+      const imgWidth = availableWidth / images.length;
+      
+      let currentX = 20; // 左边距
+      const centerY = (canvasHeight - imgWidth) / 2; // 居中显示
+      
+      images.forEach(img => {
+        // 保持宽高比
+        const ratio = img.img.naturalHeight / img.img.naturalWidth;
+        const imgHeight = imgWidth * ratio;
+        
+        img.element.style.left = `${currentX}px`;
+        img.element.style.top = `${centerY}px`;
+        img.element.style.width = `${imgWidth}px`;
+        img.element.style.height = `${imgHeight}px`;
+        
+        img.x = currentX;
+        img.y = centerY;
+        img.width = imgWidth;
+        img.height = imgHeight;
+        
+        currentX += imgWidth + spacing;
+      });
+    }
+    
+    // 应用垂直布局
+    function applyVerticalLayout() {
+      const canvasWidth = canvas.offsetWidth;
+      const canvasHeight = canvas.offsetHeight;
+      const spacing = 20;
+      const totalSpacing = (images.length - 1) * spacing;
+      const availableHeight = canvasHeight - totalSpacing - 40; // 减去边距
+      const imgHeight = availableHeight / images.length;
+      
+      let currentY = 20; // 上边距
+      
+      images.forEach(img => {
+        // 保持宽高比
+        const ratio = img.img.naturalWidth / img.img.naturalHeight;
+        const imgWidth = imgHeight * ratio;
+        const centerX = (canvasWidth - imgWidth) / 2; // 居中显示
+        
+        img.element.style.left = `${centerX}px`;
+        img.element.style.top = `${currentY}px`;
+        img.element.style.width = `${imgWidth}px`;
+        img.element.style.height = `${imgHeight}px`;
+        
+        img.x = centerX;
+        img.y = currentY;
+        img.width = imgWidth;
+        img.height = imgHeight;
+        
+        currentY += imgHeight + spacing;
+      });
+    }
+    
+    // 应用网格布局
+    function applyGridLayout(cols) {
+      const canvasWidth = canvas.offsetWidth;
+      const canvasHeight = canvas.offsetHeight;
+      const spacing = 20;
+      const padding = 20;
+      
+      const availableWidth = canvasWidth - padding * 2 - spacing * (cols - 1);
+      const cellWidth = availableWidth / cols;
+      
+      let row = 0;
+      let col = 0;
+      
+      images.forEach((img, index) => {
+        // 计算位置
+        const x = padding + col * (cellWidth + spacing);
+        const y = padding + row * (cellWidth + spacing);
+        
+        // 保持宽高比
+        const ratio = Math.min(
+          cellWidth / img.img.naturalWidth,
+          cellWidth / img.img.naturalHeight
+        );
+        const imgWidth = img.img.naturalWidth * ratio;
+        const imgHeight = img.img.naturalHeight * ratio;
+        
+        // 居中显示在单元格中
+        const cellX = x + (cellWidth - imgWidth) / 2;
+        const cellY = y + (cellWidth - imgHeight) / 2;
+        
+        img.element.style.left = `${cellX}px`;
+        img.element.style.top = `${cellY}px`;
+        img.element.style.width = `${imgWidth}px`;
+        img.element.style.height = `${imgHeight}px`;
+        
+        img.x = cellX;
+        img.y = cellY;
+        img.width = imgWidth;
+        img.height = imgHeight;
+        
+        // 更新行列
+        col++;
+        if (col >= cols) {
+          col = 0;
+          row++;
+        }
+      });
+    }
+    
+    // 应用瀑布流布局
+    function applyMasonryLayout() {
+      const canvasWidth = canvas.offsetWidth;
+      const cols = 2;
+      const spacing = 20;
+      const padding = 20;
+      
+      const availableWidth = canvasWidth - padding * 2 - spacing * (cols - 1);
+      const colWidth = availableWidth / cols;
+      
+      // 跟踪每列的当前高度
+      const colHeights = Array(cols).fill(padding);
+      
+      images.forEach(img => {
+        // 找到最短的列
+        const minHeight = Math.min(...colHeights);
+        const col = colHeights.indexOf(minHeight);
+        
+        // 计算位置
+        const x = padding + col * (colWidth + spacing);
+        const y = minHeight;
+        
+        // 保持宽高比
+        const ratio = colWidth / img.img.naturalWidth;
+        const imgWidth = colWidth;
+        const imgHeight = img.img.naturalHeight * ratio;
+        
+        img.element.style.left = `${x}px`;
+        img.element.style.top = `${y}px`;
+        img.element.style.width = `${imgWidth}px`;
+        img.element.style.height = `${imgHeight}px`;
+        
+        img.x = x;
+        img.y = y;
+        img.width = imgWidth;
+        img.height = imgHeight;
+        
+        // 更新列高度
+        colHeights[col] = y + imgHeight + spacing;
+      });
+    }
+    
+    // 上移图片
+    function bringForward() {
+      if (!selectedImage || images.length <= 1) return;
+      
+      const currentIndex = images.findIndex(img => img.id === selectedImage.id);
+      if (currentIndex < images.length - 1) {
+        // 交换数组位置
+        [images[currentIndex], images[currentIndex + 1]] = [images[currentIndex + 1], images[currentIndex]];
+        
+        // 更新z-index
+        const currentZ = parseInt(selectedImage.element.style.zIndex) || 1;
+        selectedImage.element.style.zIndex = currentZ + 1;
+        
+        // 重新渲染叠放顺序
+        renderZIndices();
+      }
+    }
+    
+    // 下移图片
+    function sendBackward() {
+      if (!selectedImage || images.length <= 1) return;
+      
+      const currentIndex = images.findIndex(img => img.id === selectedImage.id);
+      if (currentIndex > 0) {
+        // 交换数组位置
+        [images[currentIndex], images[currentIndex - 1]] = [images[currentIndex - 1], images[currentIndex]];
+        
+        // 更新z-index
+        const currentZ = parseInt(selectedImage.element.style.zIndex) || 1;
+        selectedImage.element.style.zIndex = Math.max(1, currentZ - 1);
+        
+        // 重新渲染叠放顺序
+        renderZIndices();
+      }
+    }
+    
+    // 渲染z-index
+    function renderZIndices() {
+      images.forEach((img, index) => {
+        img.element.style.zIndex = index + 1;
+      });
+    }
+    
+    // 缩放画布
+    function zoomCanvas(amount) {
+      currentScale = Math.max(0.1, Math.min(2, currentScale + amount));
+      canvas.style.transform = `scale(${currentScale})`;
+      canvas.style.transformOrigin = 'center center';
+      zoomLevel.textContent = `${Math.round(currentScale * 100)}%`;
+    }
+    
+    // 重置缩放
+    function resetZoom() {
+      currentScale = 1;
+      canvas.style.transform = 'scale(1)';
+      zoomLevel.textContent = '100%';
+    }
+    
+    // 清空画布
+    function clearCanvas() {
+      if (confirm('确定要清空所有图片吗？')) {
+        // 移除所有图片元素
+        images.forEach(img => img.element.remove());
+        
+        // 清空数组
+        images = [];
+        
+        // 清空缩略图
+        uploadedImages.innerHTML = '';
+        
+        // 重置选择
+        selectedImage = null;
+        noSelection.classList.remove('hidden');
+        imageProperties.classList.add('hidden');
+        
+        // 显示空状态
+        canvas.appendChild(emptyState);
+      }
+    }
+    
+    // 重置画布
+    function resetCanvas() {
+      if (images.length === 0) return;
+      
+      // 重新应用当前布局
+      applyLayout();
+      
+      // 重置缩放
+      resetZoom();
+    }
+    
+    // 导出画布（完全匹配编辑时的缩放和位置）
+    function exportCanvas() {
+      if (images.length === 0) {
+        alert('请先添加图片');
+        return;
+      }
+      
+      // 创建导出画布
+      const exportCanvas = document.createElement('canvas');
+      const ctx = exportCanvas.getContext('2d');
+      
+      // 计算导出范围（完全基于编辑时的坐标）
+      let minX = Infinity, minY = Infinity;
+      let maxX = -Infinity, maxY = -Infinity;
+      
+      // 收集所有图片的编辑状态（位置、大小、旋转）
+      const imageStates = images.map(img => {
+        return {
+          ...img,
+          // 计算图片实际占据的矩形（考虑旋转）
+          getBoundingRect: () => {
+            const angle = (img.rotation * Math.PI) / 180;
+            const cos = Math.abs(Math.cos(angle));
+            const sin = Math.abs(Math.sin(angle));
+            const w = img.width * cos + img.height * sin;
+            const h = img.width * sin + img.height * cos;
+            const x = img.x - (w - img.width) / 2;
+            const y = img.y - (h - img.height) / 2;
+            return { x, y, width: w, height: h };
+          }
+        };
+      });
+      
+      // 确定导出画布的尺寸（包含所有可见内容）
+      imageStates.forEach(img => {
+        const rect = img.getBoundingRect();
+        minX = Math.min(minX, rect.x);
+        minY = Math.min(minY, rect.y);
+        maxX = Math.max(maxX, rect.x + rect.width);
+        maxY = Math.max(maxY, rect.y + rect.height);
+      });
+      
+      // 添加边距
+      const padding = 20;
+      exportCanvas.width = Math.max(100, maxX - minX + padding * 2);
+      exportCanvas.height = Math.max(100, maxY - minY + padding * 2);
+      
+      // 填充背景
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+      
+      // 绘制所有图片（按编辑时的缩放和位置）
+      imageStates.forEach(img => {
+        // 创建临时画布处理变换
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+        
+        // 使用编辑时的尺寸（不是原始尺寸）
+        tempCanvas.width = img.width;
+        tempCanvas.height = img.height;
+        
+        // 绘制缩放后的图片（匹配编辑时的大小）
+        tempCtx.globalAlpha = img.opacity / 100;
+        tempCtx.drawImage(
+          img.img, 
+          0, 0, img.originalWidth, img.originalHeight,
+          0, 0, img.width, img.height
+        );
+        
+        // 处理旋转
+        if (img.rotation !== 0) {
+          const rotatedCanvas = document.createElement('canvas');
+          const rotatedCtx = rotatedCanvas.getContext('2d');
+          
+          const angle = (img.rotation * Math.PI) / 180;
+          const cos = Math.abs(Math.cos(angle));
+          const sin = Math.abs(Math.sin(angle));
+          const rotatedWidth = img.width * cos + img.height * sin;
+          const rotatedHeight = img.width * sin + img.height * cos;
+          
+          rotatedCanvas.width = rotatedWidth;
+          rotatedCanvas.height = rotatedHeight;
+          
+          // 旋转并居中
+          rotatedCtx.translate(rotatedWidth / 2, rotatedHeight / 2);
+          rotatedCtx.rotate(angle);
+          rotatedCtx.drawImage(tempCanvas, -img.width / 2, -img.height / 2);
+          
+          // 绘制到导出画布（匹配编辑时的位置）
+          ctx.drawImage(
+            rotatedCanvas,
+            img.x - minX + padding - (rotatedWidth - img.width) / 2,
+            img.y - minY + padding - (rotatedHeight - img.height) / 2
+          );
+        } else {
+          // 直接绘制（匹配编辑时的位置和大小）
+          ctx.drawImage(
+            tempCanvas,
+            img.x - minX + padding,
+            img.y - minY + padding
+          );
+        }
+      });
+      
+      // 下载图片
+      const link = document.createElement('a');
+      link.download = `拼接图片_${new Date().getTime()}.png`;
+      link.href = exportCanvas.toDataURL('image/png', 1.0);
+      link.click();
+    }
+    
+    // 初始化应用
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
